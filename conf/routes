@@ -131,6 +131,9 @@ GET            /verify/:loginId/:verificationCode                               
 GET            /sites/postList                                                        controllers.SiteApp.postList(pageNum: Int ?= 1)
 GET            /sites/issueList                                                       controllers.SiteApp.issueList(pageNum: Int ?= 1)
 
+# DevFarm
+GET            /devfarm/members                                                       controllers.devfarm.MemberApp.members()
+
 # Attachments
 GET            /files                                                                 controllers.AttachmentApp.getFileList()
 POST           /files                                                                 controllers.AttachmentApp.uploadFile()
