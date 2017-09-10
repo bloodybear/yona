@@ -6,8 +6,11 @@ CREATE TABLE df_group
 (
 	group_sn bigint(20) NOT NULL AUTO_INCREMENT,
 	current_group_sn bigint(20),
+	project_id bigint(20),
 	state_code varchar(64) NOT NULL,
 	name varchar(128) NOT NULL,
+	start_date date NOT NULL,
+	end_date date NOT NULL,
 	create_datetime datetime NOT NULL,
 	CONSTRAINT ck_df_group_state_code CHECK (state_code IN ('READY', 'IN_PROGRESS', 'COMPLETED', 'DROPPED')),
 	PRIMARY KEY (group_sn)
@@ -20,6 +23,7 @@ CREATE TABLE df_member
 	current_member_sn bigint(20),
 	user_id bigint(20) NOT NULL,
 	team_name varchar(64),
+  create_datetime datetime NOT NULL,
 	PRIMARY KEY (member_sn)
 );
 
@@ -94,11 +98,11 @@ REFERENCES df_member (member_sn)
 ;
 
 
-ALTER TABLE df_member
-	ADD FOREIGN KEY (user_id)
-REFERENCES n4user (id)
-	ON UPDATE RESTRICT
-	ON DELETE RESTRICT
+ALTER TABLE df_group
+	ADD FOREIGN KEY (project_id)
+REFERENCES project (id)
+	ON UPDATE SET NULL
+	ON DELETE SET NULL
 ;
 
 
