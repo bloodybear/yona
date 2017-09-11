@@ -362,6 +362,7 @@ menu.issue = 이슈
 menu.pullRequest = 코드 주고받기
 menu.review = 리뷰
 menu.siteAdmin = 사이트 관리
+menu.devfarmAdmin = 데브팜 관리
 milestone = 마일스톤
 milestone.close = 마일스톤 종료
 milestone.delete = 마일스톤 삭제

@@ -361,6 +361,7 @@ menu.issue = Issue
 menu.pullRequest = Pull request
 menu.review = Review
 menu.siteAdmin = Site administration
+menu.devfarmAdmin = DevFarm administration
 milestone = Milestone
 milestone.close = Close milestone
 milestone.delete = Delete milestone

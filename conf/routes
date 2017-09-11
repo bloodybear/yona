@@ -132,7 +132,8 @@ GET            /sites/postList                                                  
 GET            /sites/issueList                                                       controllers.SiteApp.issueList(pageNum: Int ?= 1)
 
 # DevFarm
-GET            /devfarm/members                                                       controllers.devfarm.MemberApp.members()
+GET            /df/members                                                            controllers.DfMemberApp.members()
+GET            /df/usageList                                                          controllers.DfUsageApp.usageList()
 
 # Attachments
 GET            /files                                                                 controllers.AttachmentApp.getFileList()

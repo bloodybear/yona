@@ -82,6 +82,14 @@
         </li>
         <li class="divider"></li>
         }
+        @if(DevFarm.isManager(UserApp.currentUser)) {
+            <li class="gnb-usermenu-item">
+                <a href="@routes.DfMemberApp.members()" data-toggle="tooltip" title="@Messages("menu.devfarmAdmin")" data-placement="bottom" class="usermenu-icon-button show-progress-bar">
+                    <i class="yobicon-wrench"></i>
+                </a>
+            </li>
+            <li class="divider"></li>
+        }
         <li class="gnb-usermenu-dropdown" id="sidebar-open-btn">
             <a href="javascript:void(0);" class="gnb-dropdown-toggle">
                 <span class="avatar-wrap smaller">
