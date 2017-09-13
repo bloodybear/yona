@@ -373,4 +373,11 @@ ldap {
     }
 }
 
+# DevFarm
+application.devfarm.organization.name = "DevFarm"
+application.devfarm.project.notice.name = "????"
+application.devfarm.project.tech.name = "Tech-Tip"
+application.devfarm.project.bbs.name = "?????"
+application.devfarm.project.qna.name = "QNA"
+
 include "social-login.conf"
