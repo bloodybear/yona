@@ -141,6 +141,8 @@ public class OrganizationUser extends Model {
         organizationUser.organization = Organization.find.byId(organizationId);
         organizationUser.role = Role.findById(roleId);
         organizationUser.save();
+
+        DfMember.addMember(organizationUser);
     }
 
     public static void delete(Long organizationId, Long userId) {
