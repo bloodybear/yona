@@ -10,8 +10,10 @@ import actions.DefaultProjectCheckAction;
 import com.avaje.ebean.*;
 
 import controllers.annotation.AnonymousCheck;
+import controllers.annotation.GuestProhibit;
 import controllers.annotation.IsAllowed;
 import info.schleichardt.play2.mailplugin.Mailer;
+import jxl.write.WriteException;
 import models.*;
 import models.enumeration.*;
 import org.apache.commons.collections.CollectionUtils;
@@ -52,6 +54,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import static com.avaje.ebean.Expr.ilike;
 import static play.data.Form.form;
 import static play.libs.Json.toJson;
 import static utils.CacheStore.getProjectCacheKey;
@@ -62,7 +65,7 @@ import static utils.TemplateHelper.*;
 @AnonymousCheck
 public class ProjectApp extends Controller {
 
-    private static final int ISSUE_MENTION_SHOW_LIMIT = 2000;
+    private static final int ISSUE_MENTION_SHOW_LIMIT = 20;
 
     private static final int MAX_FETCH_PROJECTS = 1000;
 
@@ -270,11 +273,12 @@ public class ProjectApp extends Controller {
 
         saveProjectMenuSetting(updatedProject);
         UserApp.currentUser().updateFavoriteProject(updatedProject);
+        FavoriteProject.updateFavoriteProject(updatedProject);
 
         return redirect(routes.ProjectApp.settingForm(ownerId, updatedProject.name));
     }
 
-    private static void saveProjectMenuSetting(Project project) {
+    public static void saveProjectMenuSetting(Project project) {
         Form<ProjectMenuSetting> filledUpdatedProjectMenuSettingForm = form(ProjectMenuSetting.class).bindFromRequest();
         ProjectMenuSetting updatedProjectMenuSetting = filledUpdatedProjectMenuSettingForm.get();
 
@@ -379,7 +383,8 @@ public class ProjectApp extends Controller {
     }
 
     @IsAllowed(Operation.READ)
-    public static Result mentionList(String loginId, String projectName, Long number, String resourceType) {
+    public static Result mentionList(String loginId, String projectName, Long number,
+                                     String resourceType, String query, String mentionType) {
         String prefer = HttpUtil.getPreferType(request(), HTML, JSON);
         if (prefer == null) {
             return status(Http.Status.NOT_ACCEPTABLE);
@@ -390,24 +395,33 @@ public class ProjectApp extends Controller {
         Project project = Project.findByOwnerAndProjectName(loginId, projectName);
 
         List<User> userList = new ArrayList<>();
-        collectAuthorAndCommenter(project, number, userList, resourceType);
-        addProjectMemberList(project, userList);
-        addGroupMemberList(project, userList);
-        addProjectAuthorsAndWatchersList(project, userList);
-
-        userList.remove(UserApp.currentUser());
-        userList.add(UserApp.currentUser()); //send me last at list
-
         Map<String, List<Map<String, String>>> result = new HashMap<>();
-        result.put("result", getUserList(project, userList));
-        result.put("issues", getIssueList(project));
+
+        if("user".equalsIgnoreCase(mentionType)){
+            if (StringUtils.isEmpty(query) || !project.isPublic()) {
+                collectAuthorAndCommenter(project, number, userList, resourceType);
+                addProjectMemberList(project, userList);
+                addGroupMemberList(project, userList);
+                addProjectAuthorsAndWatchersList(project, userList);
+            } else {
+                addSearchedUsers(query, userList);
+            }
+
+            userList.remove(UserApp.currentUser());
+            userList.add(UserApp.currentUser()); //send me last at list
+            result.put("result", getUserList(project, userList));
+        }
+
+        if("issue".equalsIgnoreCase(mentionType)) {
+            result.put("result", getIssueList(project, query));
+        }
 
         return ok(toJson(result));
     }
 
-    private static List<Map<String, String>> getIssueList(Project project) {
+    private static List<Map<String, String>> getIssueList(Project project, String query) {
         List<Map<String, String>> mentionListOfIssues = new ArrayList<>();
-        collectedIssuesToMap(mentionListOfIssues, getMentionIssueList(project));
+        collectedIssuesToMap(mentionListOfIssues, getMentionIssueList(project, query));
         return mentionListOfIssues;
     }
 
@@ -454,9 +468,18 @@ public class ProjectApp extends Controller {
         }
     }
 
-    private static List<Issue> getMentionIssueList(Project project) {
+    private static List<Issue> getMentionIssueList(Project project, String query) {
+        if (StringUtils.isEmpty(query)) {
+            return Issue.finder.where()
+                    .eq("project.id", project.isForkedFromOrigin() ? project.originalProject.id : project.id)
+                    .orderBy("createdDate desc")
+                    .setMaxRows(ISSUE_MENTION_SHOW_LIMIT)
+                    .findList();
+        }
         return Issue.finder.where()
                 .eq("project.id", project.isForkedFromOrigin() ? project.originalProject.id : project.id)
+                .or(ilike("title", "%" + query + "%"),
+                        ilike("number", query + "%"))
                 .orderBy("createdDate desc")
                 .setMaxRows(ISSUE_MENTION_SHOW_LIMIT)
                 .findList();
@@ -466,6 +489,8 @@ public class ProjectApp extends Controller {
     public static Result mentionListAtCommitDiff(String ownerId, String projectName, String commitId, Long pullRequestId)
             throws IOException, UnsupportedOperationException, ServletException, SVNException {
         Project project = Project.findByOwnerAndProjectName(ownerId, projectName);
+        String query = request().getQueryString("query");
+        String mentionType = request().getQueryString("mentionType");
 
         PullRequest pullRequest;
         Project fromProject = project;
@@ -479,16 +504,25 @@ public class ProjectApp extends Controller {
         Commit commit = RepositoryService.getRepository(fromProject).getCommit(commitId);
 
         List<User> userList = new ArrayList<>();
-        addCommitAuthor(commit, userList);
-        addCodeCommenters(commitId, fromProject.id, userList);
-        addProjectMemberList(project, userList);
-        addGroupMemberList(project, userList);
-        userList.remove(UserApp.currentUser());
-        userList.add(UserApp.currentUser()); //send me last at list
-
         Map<String, List<Map<String, String>>> result = new HashMap<>();
-        result.put("result", getUserList(project, userList));
-        result.put("issues", getIssueList(project));
+
+        if("user".equalsIgnoreCase(mentionType)){
+            if (StringUtils.isEmpty(query)) {
+                addCommitAuthor(commit, userList);
+                addCodeCommenters(commitId, fromProject.id, userList);
+                addProjectMemberList(project, userList);
+                addGroupMemberList(project, userList);
+            } else {
+                addSearchedUsers(query, userList);
+            }
+            userList.remove(UserApp.currentUser());
+            userList.add(UserApp.currentUser()); //send me last at list
+            result.put("result", getUserList(project, userList));
+        }
+
+        if("issue".equalsIgnoreCase(mentionType)) {
+            result.put("result", getIssueList(project, query));
+        }
 
         return ok(toJson(result));
     }
@@ -499,26 +533,38 @@ public class ProjectApp extends Controller {
         Project project = Project.findByOwnerAndProjectName(ownerId, projectName);
 
         PullRequest pullRequest = PullRequest.findById(pullRequestId);
-        List<User> userList = new ArrayList<>();
-
-        addCommentAuthors(pullRequestId, userList);
-        addProjectMemberList(project, userList);
-        addGroupMemberList(project, userList);
-        if(!commitId.isEmpty()) {
-            addCommitAuthor(RepositoryService.getRepository(pullRequest.fromProject).getCommit(commitId), userList);
-        }
-
-        User contributor = pullRequest.contributor;
-        if(!userList.contains(contributor)) {
-            userList.add(contributor);
-        }
-
-        userList.remove(UserApp.currentUser());
-        userList.add(UserApp.currentUser()); //send me last at list
 
         Map<String, List<Map<String, String>>> result = new HashMap<>();
-        result.put("result", getUserList(project, userList));
-        result.put("issues", getIssueList(project));
+        List<User> userList = new ArrayList<>();
+
+        String query = request().getQueryString("query");
+        String mentionType = request().getQueryString("mentionType");
+
+        if("user".equalsIgnoreCase(mentionType)) {
+            if (StringUtils.isEmpty(query)) {
+                addCommentAuthors(pullRequestId, userList);
+                addProjectMemberList(project, userList);
+                addGroupMemberList(project, userList);
+                if(!commitId.isEmpty()) {
+                    addCommitAuthor(RepositoryService.getRepository(pullRequest.fromProject).getCommit(commitId), userList);
+                }
+            } else {
+                addSearchedUsers(query, userList);
+            }
+
+            User contributor = pullRequest.contributor;
+            if(!userList.contains(contributor)) {
+                userList.add(contributor);
+            }
+
+            userList.remove(UserApp.currentUser());
+            userList.add(UserApp.currentUser()); //send me last at list
+            result.put("result", getUserList(project, userList));
+        }
+
+        if("issue".equalsIgnoreCase(mentionType)) {
+            result.put("result", getIssueList(project, query));
+        }
 
         return ok(toJson(result));
     }
@@ -793,12 +839,20 @@ public class ProjectApp extends Controller {
     private static void collectedUsersToMentionList(List<Map<String, String>> users, List<User> userList) {
         for (User user: userList) {
             Map<String, String> projectUserMap = new HashMap<>();
-            if (user != null && !user.loginId.equals(Constants.ADMIN_LOGIN_ID)) {
+            if (user != null && StringUtils.isNotEmpty(user.loginId) && !user.loginId.equals(Constants.ADMIN_LOGIN_ID)) {
                 projectUserMap.put("loginid", user.loginId);
                 projectUserMap.put("searchText", user.name + user.loginId);
                 projectUserMap.put("name", user.name);
                 projectUserMap.put("image", user.avatarUrl());
                 users.add(projectUserMap);
+            }
+        }
+    }
+
+    private static void addSearchedUsers(String query, List<User> userList) {
+        for (User user: User.findUsers(0, query, UserState.ACTIVE).getList()) {
+            if (!userList.contains(user)) {
+                userList.add(user);
             }
         }
     }
@@ -828,7 +882,7 @@ public class ProjectApp extends Controller {
             return;
         }
 
-        for (User user : findAuthorsAndWatchers(project)) {
+        for (User user : project.findAuthorsAndWatchers()) {
             if (!userList.contains(user)) {
                 userList.add(user);
             }
@@ -955,6 +1009,7 @@ public class ProjectApp extends Controller {
      * @param pageNum the page num
      * @return
      */
+    @GuestProhibit
     public static Result projects(String query, int pageNum) {
         if(Application.HIDE_PROJECT_LISTING){
             return forbidden(ErrorViews.Forbidden.render("error.auth.unauthorized.waringMessage"));
@@ -1199,7 +1254,8 @@ public class ProjectApp extends Controller {
 
         Webhook.create(project.id,
                         addWebhookForm.field("payloadUrl").value(),
-                        addWebhookForm.field("secret").value());
+                        addWebhookForm.field("secret").value(),
+                Boolean.valueOf(addWebhookForm.field("gitPushOnly").value()));
 
         return redirect(routes.ProjectApp.webhooks(project.owner, project.name));
     }
@@ -1227,35 +1283,21 @@ public class ProjectApp extends Controller {
         return ok();
     }
 
-    public static Set<User> findAuthorsAndWatchers(@Nonnull Project project) {
-        Set<User> allAuthors = new LinkedHashSet<>();
+    @IsAllowed(Operation.READ)
+    @Transactional
+    public static Result goConventionMenu(String ownerId, String projectName)
+            throws IOException, ServletException, SVNException, GitAPIException, WriteException {
+        Project project = Project.findByOwnerAndProjectName(ownerId, projectName);
+        List<History> histories = null;
 
-        allAuthors.addAll(getIssueUsers(project));
-        allAuthors.addAll(getPostingUsers(project));
-        allAuthors.addAll(getPullRequestUsers(project));
-        allAuthors.addAll(getWatchedUsers(project));
+        if( project.menuSetting.issue ) {
+            return IssueApp.issues(project.owner, project.name);
+        }
 
-        return allAuthors;
+        if( project.menuSetting.board ) {
+            return redirect(routes.BoardApp.posts(project.owner, project.name, 1));
+        }
+
+        return redirect(routes.ProjectApp.project(project.owner, project.name));
     }
-
-    private static Set<User> getPostingUsers(Project project) {
-        String postSql = "SELECT distinct author_id id FROM posting where project_id=" + project.id;
-        return User.find.setRawSql(RawSqlBuilder.parse(postSql).create()).findSet();
-    }
-
-    private static Set<User> getIssueUsers(Project project) {
-        String issueSql = "SELECT distinct author_id id FROM ISSUE where project_id=" + project.id;
-        return User.find.setRawSql(RawSqlBuilder.parse(issueSql).create()).findSet();
-    }
-
-    private static Set<User> getPullRequestUsers(Project project) {
-        String postSql = "SELECT distinct contributor_id id FROM pull_request where to_project_id=" + project.id;
-        return User.find.setRawSql(RawSqlBuilder.parse(postSql).create()).findSet();
-    }
-
-    private static Set<User> getWatchedUsers(Project project) {
-        String postSql = "SELECT distinct user_id id FROM watch where resource_type='PROJECT' and resource_id=" + project.id;
-        return User.find.setRawSql(RawSqlBuilder.parse(postSql).create()).findSet();
-    }
-
 }

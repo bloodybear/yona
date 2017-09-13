@@ -85,10 +85,14 @@
         }
         @requestHeader.session.get("loginId") match {
             case Some(v) => { yobi.ShortcutKey.setKeymapLink({
-                "P": "@routes.UserApp.userInfo(v)"
+                "U": "@routes.UserApp.userInfo(v)"
             }); }
             case None => { }
         }
+
+        yobi.ShortcutKey.setKeymapLink({
+            "A": "@routes.IssueApp.userIssues()"
+        });
 
         // yobi.Files
         yobi.Files.init({

@@ -182,6 +182,8 @@ public class User extends Model implements ResourceConvertible {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     public List<OrganizationUser> organizationUsers;
 
+    public boolean isGuest = false;
+
     public User() {
     }
 
@@ -375,7 +377,11 @@ public class User extends Model implements ResourceConvertible {
         ExpressionList<User> el = User.find.where();
         el.ne("id",SITE_MANAGER_ID);
         el.ne("loginId",anonymous.loginId);
-        el.eq("state", state);
+        if( state == UserState.GUEST ) {
+            el.eq("isGuest", true);
+        } else {
+            el.eq("state", state);
+        }
 
         if(StringUtils.isNotBlank(query)) {
             el = el.disjunction();
@@ -532,11 +538,8 @@ public class User extends Model implements ResourceConvertible {
     }
 
     public boolean isMemberOf(Project project) {
-        if (!projectMembersMemo.containsKey(project.id)) {
-            projectMembersMemo.put(project.id, ProjectUser.isMember(id, project.id));
-        }
-
-        return projectMembersMemo.get(project.id);
+        // TODO: Performance! Removed cache. If performance problem is occurred, fix it!
+        return ProjectUser.isMember(id, project.id);
     }
 
     public List<Project> getEnrolledProjects() {
@@ -658,7 +661,7 @@ public class User extends Model implements ResourceConvertible {
             oldPassword = "";
             password = "";
             passwordSalt = "";
-            email = "deleted-" + loginId + "@noreply.yobi.io";
+            email = "deleted-" + loginId + "@noreply.yona.io";
             rememberMe = false;
             projectUser.clear();
             enrolledProjects.clear();
@@ -880,6 +883,7 @@ public class User extends Model implements ResourceConvertible {
     public List<Project> getFavoriteProjects() {
         List<Project> projects = new ArrayList<>();
         for (FavoriteProject favoriteProject : this.favoriteProjects) {
+            favoriteProject.project.refresh();
             projects.add(0, favoriteProject.project);
         }
 
@@ -932,6 +936,7 @@ public class User extends Model implements ResourceConvertible {
     public List<Organization> getFavoriteOrganizations() {
         List<Organization> organizations = new ArrayList<>();
         for (FavoriteOrganization favoriteOrganization : this.favoriteOrganizations) {
+            favoriteOrganization.organization.refresh();
             organizations.add(0, favoriteOrganization.organization);
         }
 
@@ -971,10 +976,31 @@ public class User extends Model implements ResourceConvertible {
         projects.addAll(Project.findProjectsByMember(id));
         List<Project> list = new ArrayList<>();
         list.addAll(projects);
+        Collections.sort(list, new Comparator<Project>() {
+            @Override
+            public int compare(Project lhs, Project rhs) {
+                if(lhs.owner.compareToIgnoreCase(rhs.owner) == 0) {
+                    return lhs.name.compareToIgnoreCase(rhs.name);
+                }
+                return lhs.owner.compareToIgnoreCase(rhs.owner);
+            }
+        });
         return list;
     }
 
     public boolean isLocked() {
         return this.state == UserState.LOCKED || this.state == UserState.DELETED;
+    }
+
+    public String getPureNameOnly(){
+        String pureName = this.name;
+        String [] spliters = { "[", "(" };
+        for(String spliter: spliters) {
+            if(pureName.contains(spliter)){
+                pureName = this.name.substring(0, this.name.indexOf(spliter));
+            }
+        }
+
+        return pureName;
     }
 }

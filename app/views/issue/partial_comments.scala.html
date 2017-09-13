@@ -6,11 +6,13 @@
 **@
 @(project:Project, issue:Issue)
 
+@import org.apache.commons.lang3.StringUtils
 @import utils.TemplateHelper._
 @import utils.AccessControl._
 @import utils.JodaDateUtil
 @import play.libs.Json.toJson
 @import utils.Markdown
+@import controllers.api.IssueApi
 
 @avatarByLoginId(loginId: String, loginName: String) = {
     <a href="@userInfo(loginId)" class="usf-group" data-toggle="tooltip" data-placement="top" title="@loginName">
@@ -66,21 +68,19 @@
     case (comment: Comment) => {
     <li class="comment @isAuthorComment(comment.authorLoginId)" id="comment-@comment.id">
         <div class="comment-avatar">
-            <a href="@userInfo(comment.authorLoginId)" class="avatar-wrap" data-toggle="tooltip" data-placement="top" title="@comment.authorName">
-                <img src="@User.findByLoginId(comment.authorLoginId).avatarUrl(64)" width="32" height="32" alt="@comment.authorLoginId">
+            <a href="@userInfo(comment.authorLoginId)" class="avatar-wrap" data-toggle="tooltip" data-placement="top" title="@comment.authorLoginId">
+                <img src="@User.findByLoginId(comment.authorLoginId).avatarUrl(64)" width="32" height="32" alt="@comment.authorName">
             </a>
         </div>
         <div class="media-body">
             <div class="meta-info">
-                <span class="comment_author pull-left">
+                <span class="comment_author">
                     <span class="resp-comment-avatar">
                         <a href="@userInfo(comment.authorLoginId)" class="avatar-wrap" data-toggle="tooltip" data-placement="top" title="@comment.authorName">
                             <img src="@User.findByLoginId(comment.authorLoginId).avatarUrl(64)" width="32" height="32" alt="@comment.authorLoginId">
                         </a>
                     </span>
-                    <a href="@userInfo(comment.authorLoginId)" data-toggle="tooltip" data-placement="top" title="@comment.authorName">
-                        <strong>@comment.authorLoginId </strong>
-                    </a>
+                    <a href="@userInfo(comment.authorLoginId)" data-toggle="tooltip" data-placement="top" title="@comment.authorLoginId"><strong>@comment.authorName</strong></a>
                 </span>
                 <span class="ago-date">
                     <a href="#comment-@comment.id" class="ago" title="@JodaDateUtil.getDateString(comment.createdDate)">@utils.TemplateHelper.agoOrDateString(comment.createdDate)</a>
@@ -106,7 +106,7 @@
                                 @partial_voter_list("voters-" + issueComment.id, issueComment.voters)
                             } else {
                                 @for(voter <- issueComment.voters){
-                                    <a href="@userInfo(voter.loginId)" class="avatar-wrap smaller" data-toggle="tooltip" data-placement="top" title="@voter.name" style="margin-right:3px;">
+                                    <a href="@userInfo(voter.loginId)" class="avatar-wrap smaller" data-toggle="tooltip" data-placement="top" title="@voter.name">
                                         <img src="@User.findByLoginId(voter.loginId).avatarUrl">
                                     </a>
                                 }
@@ -128,12 +128,16 @@
                         }
                     }
 
+                    @if(StringUtils.isNotBlank(IssueApi.TRANSLATION_API)){
+                        <button type="button" class="icon btn-transparent-with-fontsize-lineheight ml10 comment-translate" data-toggle="tooltip" data-comment-id="@comment.id" title="@Messages("button.translation")"><i class="yobicon-lang"></i></button>
+                    }
+
                     @if(isAllowed(UserApp.currentUser(), comment.asResource(), Operation.READ)) {
                         <button type="button" class="btn-transparent-with-fontsize-lineheight ml10" data-toggle="comment-edit" data-comment-id="@comment.id" title="@Messages("common.comment.edit")"><i class="yobicon-edit-2"></i></button>
                     }
 
                     @if(isAllowed(UserApp.currentUser(), comment.asResource(), Operation.DELETE)) {
-                        <button type="button" class="btn-transparent-with-fontsize-lineheight ml10" data-toggle="comment-delete" data-request-uri="@routes.IssueApp.deleteComment(project.owner, project.name, issue.getNumber, comment.id)" title="@Messages("common.comment.delete")"><i class="yobicon-trash"></i></button>
+                        <button type="button" class="btn-transparent-with-fontsize-lineheight ml6" data-toggle="comment-delete" data-request-uri="@routes.IssueApp.deleteComment(project.owner, project.name, issue.getNumber, comment.id)" title="@Messages("common.comment.delete")"><i class="yobicon-trash"></i></button>
                     }
                 </span>
             </div>

@@ -16,6 +16,19 @@ $(function() {
         var PIXEL_CRITERIA_FOR_SMALL_DEVICE = 720;  // Criteria to distinguish small devices
         var SIDE_BAR_DEFAULT_WIDTH = "420px";
 
+      $(document).on("keypress", function openFavoriteMenuWithShortcutKey(event) {
+        if (isShortcutKeyPressed(event)) {
+          event.preventDefault();
+          openSidebar($sidebar);
+          updateStar();
+        }
+      });
+
+      function isShortcutKeyPressed(event) {
+        return (event.which === 102 || event.which === 12601)     // keycode => 102: f, 12623: ㄹ
+            && $(':focus').length === 0;                        // avoid already somewhere focused state
+      }
+
         $("#main").on("click", function(event){
             if( $sidebar.width() !== 0 && $(event.target).parents("#mySidenav").length == 0) {
                 closeSidebar($sidebar);
@@ -86,6 +99,7 @@ $(function() {
         }).on("keydown.moveCursorFromInputform", function(e) {
             switch (e.keyCode) {
                 case 27:   // ESC
+                    $('.project-search').blur();
                     closeSidebar($sidebar);
                     break;
                 default:
@@ -96,13 +110,13 @@ $(function() {
         $(".project-list > .star-project").on("click", function toggleProjectFavorite(e) {
             e.stopPropagation();
             var that = $(this);
-            $.post(UsermenuToggleFavoriteProjectUrl + that.data("projectId"))
+          $.post(UsermenuToggleFavoriteProjectUrl + that.data("projectId"))
                 .done(function (data) {
                     if(data.favored){
                         that.find('i').addClass("starred");
                     } else {
                         that.find('i').removeClass("starred");
-                        that.parent(".project-list").remove();
+                        removeIfNotFavoriteProject(that);
                     }
                 })
                 .fail(function (data) {
@@ -110,7 +124,25 @@ $(function() {
                 });
         });
 
-        $(".org-list > .star-org").on("click", function toggleOrgFavorite(e) {
+        function removeIfNotFavoriteProject(that) {
+            var $recentlyVisited = $('.user-li');
+            var lastFavoriteItemIndex = $recentlyVisited.index($(".favored"));
+            var currentItemIndex = $recentlyVisited.index(that.parent(".project-list").parent());
+            if (lastFavoriteItemIndex < currentItemIndex) {
+                that.parent(".project-list").remove();
+            }
+        }
+
+        $(".user-ul > .user-li").on("click", function (e) {
+            var location = $(this).data('location');
+            if(e.metaKey || e.ctrlKey) {
+                window.open(location, '_blank');
+            } else {
+                window.location = location;
+            }
+        });
+
+      $(".org-list > .star-org").on("click", function toggleOrgFavorite(e) {
             e.stopPropagation();
             var that = $(this);
             $.post(UsermenuToggleFoveriteOrganizationUrl + that.data("organizationId"))

@@ -8,7 +8,7 @@
 @import models.support.SearchCondition
 @(title: String, currentPage: Page[Issue], param: SearchCondition, project:Project)
 
-@projectLayout(Messages(title), project, utils.MenuType.ISSUE){
+@projectLayout(project.name + " - " + Messages(title), project, utils.MenuType.ISSUE){
 @projectMenu(project, utils.MenuType.ISSUE, "main-menu-only")
 <link rel="stylesheet" href="@routes.IssueLabelApp.labelStyles(project.owner, project.name)" type="text/css" />
 <div class="page-wrap-outer">
@@ -31,6 +31,16 @@
     yobi.ShortcutKey.setKeymapLink({
       "N": "@routes.IssueApp.newIssueForm(project.owner, project.name)"
     });
+
+    var $titlePrefix = $(".title-prefix");
+    $titlePrefix
+            .on("mouseover", function (e) {
+              $(".title-prefix:contains('" + e.target.innerText + "')")
+                      .addClass("title-prefix-hover");
+            })
+            .on("mouseleave", function (e) {
+              $titlePrefix.removeClass("title-prefix-hover");
+            });
   });
 </script>
 }

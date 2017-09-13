@@ -41,7 +41,6 @@ import play.mvc.Result;
 import utils.*;
 import views.html.user.*;
 
-import javax.annotation.Nonnull;
 import javax.naming.AuthenticationException;
 import javax.naming.CommunicationException;
 import javax.naming.NamingException;
@@ -53,6 +52,7 @@ import static models.NotificationMail.isAllowedEmailDomains;
 import static play.data.Form.form;
 import static play.libs.Json.toJson;
 import static utils.HtmlUtil.defaultSanitize;
+import static utils.LdapService.FALLBACK_TO_LOCAL_LOGIN;
 
 public class UserApp extends Controller {
     public static final String SESSION_USERID = "userId";
@@ -223,6 +223,10 @@ public class UserApp extends Controller {
             authenticate = authenticateWithPlainPassword(sourceUser.loginId, authInfoForm.get().password);
         }
 
+        if (!authenticate.isAnonymous()) {
+            authenticate.refresh();
+        }
+
         if(authenticate.isLocked()){
             flash(Constants.WARNING, "user.locked");
             return logout();
@@ -247,7 +251,7 @@ public class UserApp extends Controller {
         }
 
         flash(Constants.WARNING, "user.login.invalid");
-        return redirect(routes.UserApp.loginForm());
+        return redirect(getLoginFormURLWithRedirectURL());
     }
 
     private static String encodedPath(String path){
@@ -309,6 +313,7 @@ public class UserApp extends Controller {
                 setupRememberMe(user);
             }
 
+            user.refresh();
             user.lang = play.mvc.Http.Context.current().lang().code();
             user.update();
             addUserInfoToSession(user);
@@ -426,7 +431,8 @@ public class UserApp extends Controller {
             forceOAuthLogout();
             return User.anonymous;
         }
-        User created = createUserDelegate(userCredential.name, userCredential.email, null);
+        CandidateUser candidateUser = new CandidateUser(userCredential.name, userCredential.email);
+        User created = createUserDelegate(candidateUser);
 
         if(isUsingEmailVerification() && created.isLocked()){
             flash(Constants.INFO, "user.verification.mail.sent");
@@ -448,20 +454,27 @@ public class UserApp extends Controller {
         session().put("pa.url.orig", routes.Application.oAuthLogout().url());
     }
 
-    private static User createUserDelegate(@Nonnull String name, @Nonnull String email, String password) {
-        String loginIdCandidate = email.substring(0, email.indexOf("@"));
+    private static User createUserDelegate(CandidateUser candidateUser) {
+        String loginIdCandidate = candidateUser.getLoginId();
 
         User user = new User();
-        user.loginId = generateLoginId(user, loginIdCandidate);
-        user.name = name;
-        user.email = email;
 
-        if(StringUtils.isEmpty(password)){
-            user.password = (new SecureRandomNumberGenerator()).nextBytes().toBase64();  // random password because created with OAuth
-        } else {
-            user.password = password;
+        if (StringUtils.isBlank(loginIdCandidate) || LdapService.USE_EMAIL_BASE_LOGIN) {
+            loginIdCandidate = candidateUser.getEmail().substring(0, candidateUser.getEmail().indexOf("@"));
+            loginIdCandidate = generateLoginId(user, loginIdCandidate);
         }
 
+        user.loginId = loginIdCandidate;
+        user.name = candidateUser.getName();
+        user.email = candidateUser.getEmail();
+
+        if(StringUtils.isEmpty(candidateUser.getPassword())){
+            user.password = (new SecureRandomNumberGenerator()).nextBytes().toBase64();  // random password because created with OAuth
+        } else {
+            user.password = candidateUser.getPassword();
+        }
+
+        user.isGuest = candidateUser.isGuest();
         return createNewUser(user);
     }
 
@@ -639,7 +652,7 @@ public class UserApp extends Controller {
         if ((userKey != null && Long.valueOf(userId) != null)){
             user = CacheStore.yonaUsers.getIfPresent(Long.valueOf(userId));
         }
-        if (user == null) {
+        if (user == null || user.isLocked()) {
             return invalidSession();
         }
         return user;
@@ -651,7 +664,14 @@ public class UserApp extends Controller {
             return (User) cached;
         }
         initTokenUser();
-        return (User) Http.Context.current().args.get(TOKEN_USER);
+        User foundUser = (User) Http.Context.current().args.get(TOKEN_USER);
+
+        if(foundUser.isLocked()) {
+            processLogout();
+            return User.anonymous;
+        }
+
+        return foundUser;
     }
 
     public static void initTokenUser() {
@@ -679,7 +699,7 @@ public class UserApp extends Controller {
     }
 
     private static User invalidSession() {
-        session().clear();
+        processLogout();
         return User.anonymous;
     }
 
@@ -886,7 +906,7 @@ public class UserApp extends Controller {
         }
     }
 
-    private static boolean isUsingEmailVerification() {
+    public static boolean isUsingEmailVerification() {
         return usingEmailVerification;
     }
 
@@ -1134,34 +1154,55 @@ public class UserApp extends Controller {
         LdapService ldapService = new LdapService();
         try {
             LdapUser ldapUser = ldapService.authenticate(loginIdOrEmail, password);
+            play.Logger.debug("l: " + ldapUser);
+
             User localUserFoundByLdapLogin = User.findByEmail(ldapUser.getEmail());
             if (localUserFoundByLdapLogin.isAnonymous()) {
-                User created = createUserDelegate(ldapUser.getDisplayName(), ldapUser.getEmail(), password);
-                if (created.state == UserState.LOCKED) {
-                    flash(Constants.INFO, "user.signup.requested");
-                    return User.anonymous;
-                }
-                return created;
+                return createNewUser(password, ldapUser);
             } else {
                 if(!localUserFoundByLdapLogin.isSamePassword(password)) {
                     User.resetPassword(localUserFoundByLdapLogin.loginId, password);
                 }
+
+                localUserFoundByLdapLogin.refresh();
+                localUserFoundByLdapLogin.name = ldapUser.getDisplayName();
+                localUserFoundByLdapLogin.isGuest = ldapUser.isGuestUser();
+                localUserFoundByLdapLogin.update();
                 return localUserFoundByLdapLogin;
             }
         } catch (CommunicationException e) {
             play.Logger.error("Cannot connect to ldap server \n" + e.getMessage());
             e.printStackTrace();
             return User.anonymous;
-        }
-        catch (AuthenticationException e) {
+        } catch (AuthenticationException e) {
             flash(Constants.WARNING, Messages.get("user.login.invalid"));
             play.Logger.warn("login failed \n" + e.getMessage());
+            if(FALLBACK_TO_LOCAL_LOGIN){
+                play.Logger.warn("fallback to local login: " + loginIdOrEmail);
+                return authenticateWithPlainPassword(loginIdOrEmail, password);
+            }
             return User.anonymous;
         } catch (NamingException e) {
             play.Logger.error("Cannot connect to ldap server \n" + e.getMessage());
             e.printStackTrace();
             return User.anonymous;
         }
+    }
+
+    private static User createNewUser(String password, LdapUser ldapUser) {
+        CandidateUser candidateUser = new CandidateUser(
+                ldapUser.getDisplayName(),
+                ldapUser.getEmail(),
+                ldapUser.getUserLoginId(),
+                password,
+                ldapUser.isGuestUser()
+        );
+        User created = createUserDelegate(candidateUser);
+        if (created.state == UserState.LOCKED) {
+            flash(Constants.INFO, "user.signup.requested");
+            return User.anonymous;
+        }
+        return created;
     }
 
     public static boolean isUsingSignUpConfirm(){
@@ -1206,7 +1247,7 @@ public class UserApp extends Controller {
         }
     }
 
-    private static User createNewUser(User user) {
+    public static User createNewUser(User user) {
         RandomNumberGenerator rng = new SecureRandomNumberGenerator();
         user.passwordSalt = rng.nextBytes().toBase64();
         user.password = hashedPassword(user.password, user.passwordSalt);

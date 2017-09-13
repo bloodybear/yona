@@ -6,6 +6,7 @@
  **/
 package utils;
 
+import models.User;
 import models.support.LdapUser;
 import play.Play;
 
@@ -23,20 +24,33 @@ public class LdapService {
     private static final String BASE_DN = Play.application().configuration().getString("ldap.baseDN", "");
     private static final String DN_POSTFIX = Play.application().configuration().getString("ldap.distinguishedNamePostfix", "");
     private static final String PROTOCOL = Play.application().configuration().getString("protocol", "ldap");
+    private static final String LOGIN_PROPERTY = Play.application().configuration().getString("ldap.loginProperty", "sAMAccountName");
+    private static final String DISPLAY_NAME_PROPERTY = Play.application().configuration().getString("ldap.displayNameProperty", "displayName");
+    private static final String USER_NAME_PROPERTY = Play.application().configuration().getString("ldap.userNameProperty", "CN");
+    public static final boolean USE_EMAIL_BASE_LOGIN = Play.application().configuration().getBoolean("ldap" +
+            ".options.useEmailBaseLogin", false);
+    public static final boolean FALLBACK_TO_LOCAL_LOGIN = Play.application().configuration().getBoolean("ldap" +
+            ".options.fallbackToLocalLogin", false);
+    private static final String EMAIL_PROPERTY = Play.application().configuration().getString("ldap" +
+            ".emailProperty", "mail");
     private static final int TIMEOUT = 5000; //ms
 
     public LdapUser authenticate(String username, String password) throws NamingException {
+
+        String guessedUserIdentity = guessedUser(username);
 
         Hashtable<String, String> env = new Hashtable<>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put("com.sun.jndi.ldap.connect.timeout", ""+(TIMEOUT));
         env.put(Context.PROVIDER_URL, PROTOCOL + "://" + HOST + ":" + PORT);
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        env.put(Context.SECURITY_PRINCIPAL, getProperUsernameGuessing(username));
+        play.Logger.info("getProperUsernameGuessing: " + getProperUsernameGuessing(guessedUserIdentity));
+        env.put(Context.SECURITY_PRINCIPAL, getProperUsernameGuessing(guessedUserIdentity));
         env.put(Context.SECURITY_CREDENTIALS, password);
 
         DirContext authContext = new InitialDirContext(env);
-        SearchResult searchResult = findUser(authContext, username, searchFilter(username));
+        SearchResult searchResult = findUser(authContext, guessedUserIdentity, searchFilter(guessedUserIdentity));
+
         if (searchResult != null) {
             return getLdapUser(searchResult);
         } else {
@@ -44,19 +58,33 @@ public class LdapService {
         }
     }
 
+    private String guessedUser(String username) {
+        if(!USE_EMAIL_BASE_LOGIN){
+            return username;
+        }
+
+        String guessedUserIdentity = username;
+        User user = User.findByLoginId(username);
+        if (!user.isAnonymous()) {
+            guessedUserIdentity = user.email;
+        }
+
+        return guessedUserIdentity;
+    }
+
     private LdapUser getLdapUser(SearchResult searchResult) throws NamingException {
         Attributes attr = searchResult.getAttributes();
-        return new LdapUser(attr.get("displayName"),
-                attr.get("mail"),
-                attr.get("sAMAccountName"),
+        return new LdapUser(attr.get(DISPLAY_NAME_PROPERTY),
+                attr.get(EMAIL_PROPERTY),
+                attr.get(LOGIN_PROPERTY),
                 attr.get("department"));
     }
 
     private String searchFilter(@Nonnull String username) {
         if(username.contains("@")){
-            return "mail";
+            return EMAIL_PROPERTY;
         } else {
-            return "sAMAccountName";
+            return LOGIN_PROPERTY;
         }
     }
 
@@ -64,14 +92,15 @@ public class LdapService {
         if(username.contains("@")){
             return username;
         } else {
-            return "CN=" + username + ", " +  DN_POSTFIX;
+            return USER_NAME_PROPERTY + "=" + username + "," +  DN_POSTFIX;
         }
     }
 
     private SearchResult findUser(DirContext ctx, String username, String filter) throws NamingException {
 
-        String searchFilter = "(&(objectClass=user)(" + filter + "=" + username + "))";
+        String searchFilter = "(" + filter + "=" + username + ")";
 
+        play.Logger.info("filter: " + searchFilter);
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 

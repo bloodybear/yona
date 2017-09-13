@@ -114,6 +114,12 @@ public class Posting extends AbstractPosting {
                 .ge("createdDate", JodaDateUtil.before(days)).order().desc("createdDate").findList();
     }
 
+    public static int countRecentlyCreatedByDaysAgo(Project project, int days) {
+        return Posting.finder.where()
+                .eq("project.id", project.id)
+                .ge("createdDate", JodaDateUtil.before(days)).order().desc("createdDate").findRowCount();
+    }
+
     /**
      * @see models.AbstractPosting#getComments()
      */

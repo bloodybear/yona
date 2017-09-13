@@ -17,6 +17,7 @@ import models.*;
 import models.enumeration.Operation;
 import models.enumeration.ResourceType;
 import models.enumeration.State;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -104,6 +105,12 @@ public class IssueApp extends AbstractPostingApp {
 
     @Transactional
     @IsAllowed(Operation.READ)
+    public static Result issues(String ownerName, String projectName) throws WriteException, IOException {
+       return issues(ownerName, projectName, State.OPEN.state(), "html", 1);
+    }
+
+    @Transactional
+    @IsAllowed(Operation.READ)
     public static Result issues(String ownerName, String projectName, String state, String format, int pageNum) throws WriteException, IOException {
         Project project = Project.findByOwnerAndProjectName(ownerName, projectName);
 
@@ -154,9 +161,10 @@ public class IssueApp extends AbstractPostingApp {
 
     private static Result issuesAsHTML(Project project, Page<Issue> issues, models.support.SearchCondition searchCondition){
         if(project == null){
-            return ok(my_list.render("title.issueList", issues, searchCondition, project));
+            return ok(my_list.render("menu.issue", issues, searchCondition, project));
         } else {
-            return ok(list.render("title.issueList", issues, searchCondition, project));
+            UserApp.currentUser().visits(project);
+            return ok(list.render("menu.issue", issues, searchCondition, project));
         }
 
     }
@@ -273,6 +281,54 @@ public class IssueApp extends AbstractPostingApp {
         }
 
         return ok(partial_comments.render(project, issueInfo));
+    }
+
+    public static Result newDirectIssueForm() {
+        User current = UserApp.currentUser();
+
+        Project project = null;
+        // Fallback #1: Favorite projects 1st if exists
+        if(!CollectionUtils.isEmpty(current.favoriteProjects)) {
+            project = current.favoriteProjects.get(current.favoriteProjects.size() - 1).project;
+        }
+
+        // Fallback #2: Last visited project
+        List<Project> visitedProjects = current.getVisitedProjects();
+        if (project == null && !CollectionUtils.isEmpty(visitedProjects)) {
+            project = visitedProjects.get(0);
+        }
+
+        if(project != null){
+            return newIssueForm(project.owner, project.name);
+        } else {
+            flash(Constants.WARNING, Messages.get("project.is.empty"));
+            return Application.index();
+        }
+    }
+
+    public static Result newDirectMyIssueForm() {
+        User current = UserApp.currentUser();
+
+        // Prefixed project. inbox or _private
+        Project project = Project.findByOwnerAndProjectName(current.loginId, "inbox");
+        if( project == null ) {
+            project = Project.findByOwnerAndProjectName(current.loginId, "_private");
+        }
+
+        // Fallback to any other project
+        if( project == null ) {
+            List<Project> projects = Project.findProjectsByMember(current.id);
+            if(!CollectionUtils.isEmpty(projects)) {
+                project = projects.get(0);
+            }
+        }
+
+        if(project != null){
+            return newIssueForm(project.owner, project.name);
+        } else {
+            flash(Constants.WARNING, Messages.get("project.is.empty"));
+            return Application.index();
+        }
     }
 
     @AnonymousCheck(requiresLogin = true, displaysFlashMessage = true)
@@ -426,7 +482,6 @@ public class IssueApp extends AbstractPostingApp {
                 project = toAnotherProject;
             }
         }
-        removeAnonymousAssignee(newIssue);
 
         if (newIssue.body == null) {
             return status(REQUEST_ENTITY_TOO_LARGE,
@@ -441,6 +496,19 @@ public class IssueApp extends AbstractPostingApp {
         newIssue.setAuthor(UserApp.currentUser());
         newIssue.project = project;
 
+        String assineeLoginId = null;
+        String[] assigneeLoginIds = request().body().asMultipartFormData().asFormUrlEncoded().get("assigneeLoginId");
+        if(assigneeLoginIds != null && assigneeLoginIds.length > 0) {
+            assineeLoginId = assigneeLoginIds[0];
+        }
+
+        User assigneeUser = User.findByLoginId(assineeLoginId);
+
+        if(!assigneeUser.isAnonymous()){
+            newIssue.assignee = new Assignee(assigneeUser.id, project.id);
+        } else {
+            newIssue.assignee = null;
+        }
         newIssue.state = State.OPEN;
 
         if (newIssue.project.id.equals(Project.findByOwnerAndProjectName(ownerName, projectName).id)) {
@@ -549,8 +617,16 @@ public class IssueApp extends AbstractPostingApp {
 
         final Issue issue = issueForm.get();
 
-        setAssignee(issueForm, issue, project);
-        removeAnonymousAssignee(issue);
+        String assineeLoginId = request().body().asMultipartFormData()
+                .asFormUrlEncoded().get("assigneeLoginId")[0];
+
+        User assigneeUser = User.findByLoginId(assineeLoginId);
+        if(!assigneeUser.isAnonymous()){
+            issue.assignee = new Assignee(assigneeUser.id, project.id);
+        } else {
+            issue.assignee = null;
+        }
+
         setMilestone(issueForm, issue);
         issue.dueDate = JodaDateUtil.lastSecondOfDay(issue.dueDate);
 

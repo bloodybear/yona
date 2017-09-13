@@ -19,6 +19,11 @@
     play.mvc.Http.Context.current().request().getQueryString("parentIssueId")
 }
 
+@isFromGlobalMenuNew = @{
+    routes.IssueApp.newDirectIssueForm.toString().equals(requestHeader.path) ||
+            routes.IssueApp.newDirectMyIssueForm.toString().equals(requestHeader.path)
+}
+
 @projectLayout(Messages(title), project, utils.MenuType.ISSUE) {
 @projectMenu(project, utils.MenuType.ISSUE, "main-menu-only")
 <div class="page-wrap-outer">
@@ -34,7 +39,7 @@
                                 <div class="span11">
                                     <input type="text" id="title" name="title" value="" class="text title @if(errors != null) {error}" maxlength="250" tabindex="1" placeholder="@Messages("title")">
                                 </div>
-                                <div class="span1 subtask-message">@Messages("issue.subtask")</div>
+                                <div class="span1 subtask-message">@Messages("issue.option")</div>
                             </div>
     	                    @if(errors != null) {
     							<div class="message">
@@ -57,7 +62,11 @@
                 <div class="span9 span-left-pane">
                     <dl>
                         <dd style="position: relative;">
+                        @if(StringUtils.isNotBlank(parentIssueId)) {
+                            @common.editor("body", "", "tabindex=2", "content-body")
+                        } else {
                             @common.editor("body", issueTemplate, "tabindex=2", "content-body")
+                        }
                         </dd>
                     </dl>
 
@@ -136,6 +145,7 @@
 <script type="text/javascript" src="@routes.Assets.at("javascripts/lib/atjs/jquery.caret.min.js")"></script>
 <script type="text/javascript" src="@routes.Assets.at("javascripts/lib/atjs/jquery.atwho.js")"></script>
 <script type="text/javascript" src="@routes.Assets.at("javascripts/common/yona.Subtask.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/service/yona.issue.Assginee.js")"></script>
 <script type="text/javascript">
     $(function(){
         // yobi.issue.Write
@@ -153,6 +163,16 @@
             "target": 'textarea[id^=editor-]',
             "url"   : "@routes.ProjectApp.mentionList(project.owner, project.name)"
         });
+
+        if(@isFromGlobalMenuNew) {
+            $(".subtask-message").trigger("click");
+        }
+
+        yonaAssgineeModule(
+                "@api.routes.IssueApi.findAssignableUsersOfProject(project.owner, project.name)",
+                "",
+                "@Messages("issue.assignee")"
+        );
     });
 </script>
 }

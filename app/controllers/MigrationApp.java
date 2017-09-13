@@ -140,13 +140,31 @@ public class MigrationApp {
             ObjectNode member = Json.newObject();
             member.put("name", assignee.user.name);
             member.put("login", assignee.user.loginId);
+            member.put("email", assignee.user.email);
             members.add(member);
         }
         return members;
     }
 
+    public static List<ObjectNode> getAuthors(Project project) {
+        List<ObjectNode> authors = new ArrayList<>();
+        for(User user: project.findAuthors()){
+            ObjectNode member = Json.newObject();
+            member.put("name", user.name);
+            member.put("login", user.loginId);
+            member.put("email", user.email);
+            authors.add(member);
+        }
+        return authors;
+    }
+
     @AnonymousCheck(requiresLogin = true, displaysFlashMessage = true)
     public static Result exportIssueLabelPairs(String owner, String projectName){
+        ObjectNode issueLabelPairs = composeIssueLabelPairJson(owner, projectName);
+        return ok(issueLabelPairs);
+    }
+
+    public static ObjectNode composeIssueLabelPairJson(String owner, String projectName) {
         Project project = Project.findByOwnerAndProjectName(owner, projectName);
 
         Query<IssueLabelAggregate> query = Ebean.find(IssueLabelAggregate.class);
@@ -160,8 +178,9 @@ public class MigrationApp {
 
         ObjectNode issueLabelPairs = Json.newObject();
         issueLabelPairs.put("issueLabelPairs", toJson(results));
-        return ok(issueLabelPairs);
+        return issueLabelPairs;
     }
+
 
     @AnonymousCheck(requiresLogin = true, displaysFlashMessage = true)
     public static Result exportLabels(String owner, String projectName){
@@ -219,6 +238,13 @@ public class MigrationApp {
     }
 
     public static ObjectNode composeMilestoneJson(Milestone m) {
+
+        ObjectNode milestoneJson = Json.newObject();
+        milestoneJson.put("milestone", getMilestoneNode(m));
+        return milestoneJson;
+    }
+
+    public static ObjectNode getMilestoneNode(Milestone m) {
         ObjectNode node = Json.newObject();
         node.put("id", m.id);
         node.put("title", m.title);
@@ -226,10 +252,7 @@ public class MigrationApp {
         node.put("description", m.contents);
         Optional.ofNullable(m.dueDate).ifPresent(dueDate -> node.put("due_on",
                 LocalDateTime.ofInstant(m.dueDate.toInstant(), ZoneId.systemDefault()).format(formatter)));
-
-        ObjectNode milestoneJson = Json.newObject();
-        milestoneJson.put("milestone", node);
-        return milestoneJson;
+        return node;
     }
 
     private static String addOriginalAuthorName(String bodyText, String authorLoginId,

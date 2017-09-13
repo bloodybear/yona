@@ -200,7 +200,6 @@
                     }
 
                     .counter-badge {
-                        font-family: @fixed-font-family;
                         display: inline-block;
                         font-size: 12px;
                         min-width: 12px;
@@ -560,7 +559,6 @@
     background-color: @yobi-primary;
     color: #ECF0F1;
     text-align: center;
-    font-family: @fixed-font-family;
     vertical-align: top;
     .border-radius(9px);
 }
@@ -591,13 +589,9 @@
 }
 
 .site-breadcrumb-outer {
-    height: 59px;
-    border-bottom:1px solid #ddd;
-
     .site-breadcrumb-inner {
         width: 1170px;
         margin:0 auto;
-        height: 59px;
 
         h3 {
             padding:15px 0 14px;
@@ -1448,6 +1442,13 @@
     }
 
     .alert h4 { font-size:15px; }
+
+    .email-verification-help {
+        font-weight: bold;
+        padding: 5px;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
 }
 .login-form-wrap {
     margin-top: 54px;
@@ -1464,7 +1465,6 @@
     }
 
     .act-row {
-        margin-bottom: 42px;
         line-height:22px;
         overflow:auto;
     }
@@ -1474,6 +1474,16 @@
         text-align:center;
         margin:0px auto 20px;
     }
+
+    .social-login-title {
+        font-size: 14px;
+        padding-top: 10px;
+    }
+    .social-login-title-line {
+        margin-top: 12px;
+        margin-bottom: 10px;
+    }
+;
 }
 
 //---- sign up
@@ -1681,7 +1691,6 @@
                 width: 50px;
                 height: 50px;
                 margin-right: 10px;
-                border: 1px solid #DDD9D9;
                 border-radius: 3px !important;
                 position: relative;
                 img {
@@ -1694,6 +1703,7 @@
                 font-size: 20px;
                 font-weight: bold;
                 margin-bottom: 5px;
+                margin-left: 10px;
 
                 .yobicon-lock { color:#7F8C8D;}
                 .owner-name-small{ color:#999; font-size: 19px; }
@@ -2006,6 +2016,13 @@ label.inline-list {
     }
 }
 
+.guest-mixin() {
+    background-color: rgba(255, 165, 0, 0.8);;
+    color: white;
+    padding: 2px;
+    font-size: 10px;
+}
+
 .members.project {
     margin: 0;
     list-style: none;
@@ -2041,6 +2058,9 @@ label.inline-list {
                 padding:5px;
             }
         }
+    }
+    .guest {
+        .guest-mixin
     }
 }
 
@@ -2721,7 +2741,7 @@ label.inline-list {
 
 .board-body {
     .author-info {
-        display:inline-block;
+        display:block;
         margin:10px 20px;
     }
 
@@ -2887,6 +2907,7 @@ label.inline-list {
                         font-size:13px;
                         margin-right:5px;
                         color: #3f3e40;
+                        vertical-align: middle;
                     }
                     .ago {
                         color:#7F8C8D;
@@ -3207,9 +3228,32 @@ div.markdown-preview {
         }
     }
 }
+
 .board-actrow {
     margin:20px 0;
     overflow:auto;
+    padding-right: 15px;
+    button.icon {
+        line-height: 30px;
+        font-size: 22px;
+        color: lightgray;
+        .yobicon-lang {
+            font-size: 20px;
+        }
+        &.disabled {
+            color: #eee !important;
+        }
+        &:hover {
+            color: #51aacc;
+            opacity: 1;
+        }
+        .yobicon-hearts {
+            font-size: 16px;
+        }
+    }
+    .pt5px {
+        padding-top: 5px;
+    }
 }
 
 .labels-wrap {
@@ -3546,8 +3590,8 @@ label.issue-item-row {
         }
 
         .title {
-            color:#333;
-            font-size:16px;
+            color: #333;
+            font-size: 15px;
             font-weight: 600;
 
             &.project {
@@ -3873,7 +3917,7 @@ label.issue-item-row {
     .heart {
         display:inline-block;
         color:#ddd;
-        font-size:11px;
+        font-size: 17px;
         margin-right:2px;
         vertical-align:middle;
     }
@@ -3940,18 +3984,19 @@ label.issue-item-row {
     li {
         float:left;
         margin-right:3px;
+        line-height:30px;
+        padding-bottom: 5px;
 
         &:last-of-type {
             margin-right:0;
-            line-height:30px;
         }
     }
 
     .usf-group {
         display:inline-block;
-        width:30px; height:30px;
-
-        img { width:30px; height:30px; }
+    }
+    .avatar-wrap {
+        margin-right: 0 !important;
     }
 }
 .voters-dialog {
@@ -4649,6 +4694,23 @@ label.issue-item-row {
         }
     }
 
+    .guest-user {
+        background-color: rgba(255, 165, 0, 0.8);;
+        color: white;
+        text-align: center;
+        width: 20px;
+        border-radius: 3px;
+
+        .left-mark {
+            width: 10px;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            font-size: 10px;
+            margin-left: 10px;
+            padding-top: 5px;
+        }
+    }
+
     .user-since {
         margin-top: 10px;
         padding:0 10px;
@@ -4933,12 +4995,25 @@ label.issue-item-row {
         }
 
         .listitem-col {
-            padding: 5px 10px;
-            overflow: hidden;
+            font-size: 12px;
+            padding: 10px 0;
             text-overflow: ellipsis;
-            white-space: nowrap;
             word-break : break-all;
-            line-height: 50px;
+            line-height: 20px;
+            .user-id {
+                font-size: 13px;
+            }
+            .email {
+                font-size: 13px;
+                line-height: 43px;
+            }
+            .created-date {
+                padding: 0;
+                line-height: 30px;
+            }
+            &.action-buttons {
+                padding-top: 0;
+            }
         }
 
         &:nth-child(even) {
@@ -6143,7 +6218,6 @@ div.diff-body[data-outdated="true"] tr:hover .icon-comment {
         .yobicon-error { vertical-align: middle; margin-right:5px; font-size:13px; }
     }
     .act-row {
-        margin-bottom:20px;
         input.checkbox { margin-top:4px !important; }
         label.bg-checkbox { display:inline-block; }
     }
@@ -6423,10 +6497,19 @@ div.diff-body[data-outdated="true"] tr:hover .icon-comment {
 }
 
 .title-prefix {
-  font-size: 15px;
-  font-weight: bold;
-  border-radius: 2px;
-  color: #3592B5;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 2px;
+    color: #3592B5;
+    &:hover {
+        background-color: #3592B5;
+        color: white;
+    }
+}
+
+.title-prefix-hover {
+    background-color: #3592B5;
+    color: white;
 }
 
 .send-notification-check {
@@ -6589,6 +6672,7 @@ div.diff-body[data-outdated="true"] tr:hover .icon-comment {
         }
         .file-size {
             text-align: right;
+            font-size: 11px;
         }
         .file-download {
             font-size: 16px;
@@ -6596,7 +6680,7 @@ div.diff-body[data-outdated="true"] tr:hover .icon-comment {
         }
         .file-date {
             text-align: right;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .file-location {
@@ -6654,6 +6738,11 @@ div.diff-body[data-outdated="true"] tr:hover .icon-comment {
 
 .width16px {
     width: 16px;
+    display: inline-block;
+}
+
+.width25px {
+    width: 25px;
     display: inline-block;
 }
 
@@ -6857,4 +6946,33 @@ div.diff-body[data-outdated="true"] tr:hover .icon-comment {
     //box-shadow: inset 0 0 5px 5px #222;
     box-shadow: 2px 2px 8px #000;
     background: #FFF url('/assets/images/loading-gif-2.gif') no-repeat center;
+}
+
+.myissues-search-input {
+    margin: 20px 0 20px;
+}
+
+.project-protected {
+    background-color: #00bcd4;
+    border-radius: 2px;
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.7);
+    padding: 0 2px;
+}
+
+.no-margin {
+    margin: 0;
+}
+
+.my-issues {
+    .post-item {
+        padding: 6px 10px;
+      
+        .title-wrap {
+            margin-top: 2px;
+        }
+        .infos {
+            margin-top: 4px;
+        }
+    }
 }

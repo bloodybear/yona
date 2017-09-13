@@ -1,32 +1,21 @@
 /**
- * Yobi, Project Hosting SW
+ * Yona, Project Hosting SW
  *
- * Copyright 2013 NAVER Corp.
- * http://yobi.io
- *
- * @author Keesun Baik
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 the original author or authors.
  */
 package controllers;
 
+import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.Page;
 import controllers.annotation.AnonymousCheck;
+import controllers.annotation.GuestProhibit;
 import models.*;
 import models.enumeration.Operation;
 import models.enumeration.RequestState;
 import models.enumeration.RoleType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.collections.CollectionUtils;
 import play.data.Form;
 import play.data.validation.Validation;
 import play.data.validation.ValidationError;
@@ -71,6 +60,7 @@ public class OrganizationApp extends Controller {
      * @throws Exception
      */
     @AnonymousCheck(requiresLogin = true, displaysFlashMessage = true)
+    @GuestProhibit
     public static Result newOrganization() throws Exception {
         Form<Organization> newOrgForm = form(Organization.class).bindFromRequest();
         if (newOrgForm.hasErrors()) {
@@ -132,11 +122,11 @@ public class OrganizationApp extends Controller {
             return result;
         }
 
-        User user = User.findByLoginId(addMemberForm.get().loginId);
+        User targetUser = User.findByLoginId(addMemberForm.get().loginId);
         Organization organization = Organization.findByName(organizationName);
-        OrganizationUser.assignRole(user.id, organization.id, RoleType.ORG_MEMBER.roleType());
+        OrganizationUser.assignRole(targetUser.id, organization.id, RoleType.ORG_MEMBER.roleType());
         organization.cleanEnrolledUsers();
-        NotificationEvent.afterOrganizationMemberRequest(organization, user, RequestState.ACCEPT);
+        NotificationEvent.afterOrganizationMemberRequest(organization, targetUser, RequestState.ACCEPT);
 
         return redirect(routes.OrganizationApp.members(organizationName));
     }
@@ -147,6 +137,11 @@ public class OrganizationApp extends Controller {
 
         if (addMemberForm.hasErrors() || userToBeAdded.isAnonymous()) {
             flash(Constants.WARNING, "organization.member.unknownUser");
+            return redirect(routes.OrganizationApp.members(organizationName));
+        }
+
+        if (userToBeAdded.isGuest) {
+            flash(Constants.WARNING, "error.forbidden.to.guest.user");
             return redirect(routes.OrganizationApp.members(organizationName));
         }
 
@@ -361,6 +356,7 @@ public class OrganizationApp extends Controller {
         Organization original = Organization.find.byId(modifiedOrganization.id);
         original.updateWith(modifiedOrganization);
         UserApp.currentUser().updateFavoriteOrganization(modifiedOrganization);
+        FavoriteOrganization.updateFavoriteOrganization(modifiedOrganization);
 
         return redirect(routes.OrganizationApp.settingForm(modifiedOrganization.name));
     }
@@ -456,5 +452,19 @@ public class OrganizationApp extends Controller {
         }
 
         return new ValidationResult(okWithLocation(routes.OrganizationApp.organization(organization.name).url()), false);
+    }
+
+    @GuestProhibit
+    public static Result orgList(String query, int pageNum){
+        if(Application.HIDE_PROJECT_LISTING){
+            return forbidden(ErrorViews.Forbidden.render("error.auth.unauthorized.waringMessage"));
+        }
+
+        if (pageNum < 1) {
+            return notFound(ErrorViews.NotFound.render("error.notfound"));
+        }
+        Page<Organization> orgs = Organization.findByNameLike(query).getPage(pageNum-1);
+
+        return ok(views.html.organization.list.render("title.projectList", orgs, query));
     }
 }

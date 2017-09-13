@@ -4,12 +4,13 @@ body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,form,fieldset,p,button{
 }
 
 body {
-   background-color: @yobi-background;
-   font-family: @base-font-family;
-   text-rendering: auto !important;
+    background-color: @yobi-background;
+    font-family: @base-font-family;
+    text-rendering: auto !important;
+    overflow-y: scroll;
 }
 
-input, textarea { font-family: @fixed-font-family !important; }
+textarea { font-family: @fixed-font-family !important; }
 button, select { font-family: @base-font-family !important; }
 h1,h2,h3,h4,h5,h6 { text-rendering:auto !important; }
 
@@ -204,10 +205,13 @@ input[type=number]::-webkit-outer-spin-button {
 .mb20 { margin-bottom:20px; }
 .mr20 { margin-right:20px; }
 .ml5 { margin-left:5px; }
+.ml6 { margin-left:6px; }
+.mr6 { margin-right:6px; }
 .mr5 { margin-right:5px; }
 .mt5 { margin-top:5px; }
 .mt4 { margin-top:4px; }
 .mr3 { margin-right:3px; }
+.pb4 { padding-bottom: 4px}
 
 .margin-top-20   { margin-top:20px;   }
 .margin-left-20  { margin-left: 20px; }

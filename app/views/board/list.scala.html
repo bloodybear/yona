@@ -22,7 +22,7 @@
 	}
 }
 
-@projectLayout(title, project, utils.MenuType.BOARD) {
+@projectLayout(project.name + " - " + Messages(title), project, utils.MenuType.BOARD) {
 @projectMenu(project, utils.MenuType.BOARD, "main-menu-only")
 <link rel="stylesheet" href="@routes.IssueLabelApp.labelStyles(project.owner, project.name)" type="text/css" />
 <div class="page-wrap-outer">
@@ -108,6 +108,15 @@
         $('.board-labels select').on('change', function(e){
             $("#option_form").submit();
         });
+        var $titlePrefix = $(".title-prefix");
+        $titlePrefix
+                .on("mouseover", function (e) {
+                    $(".title-prefix:contains('" + e.target.innerText + "')")
+                            .addClass("title-prefix-hover");
+                })
+                .on("mouseleave", function (e) {
+                    $titlePrefix.removeClass("title-prefix-hover");
+                });
 	});
 </script>
 @common.select2()

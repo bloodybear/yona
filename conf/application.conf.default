@@ -21,6 +21,21 @@ application.siteName="Yona"
 # want to allow that, set signup.require.confirm to true.
 application.allowsAnonymousAccess=true
 
+# Guest User Id Rule
+# ~~~~~~~~~~~~~
+# If login id is created with following prefixes,
+# Yona treat that user is Guest User.
+# Guest user is extremely restricted in use of Yona.
+# They can not see any project listing of instance and
+# only create own account's projects.
+# In other words, they cannot create organization.
+# If multiple prefixes are needed, user , (comma)
+#
+# eg.
+# "PT_, GUEST_"
+
+application.guest.user.login.id.prefix = ""
+
 #
 # Signup options
 # ~~~~~~~~~~~~~~
@@ -41,6 +56,10 @@ application.allowsAnonymousAccess=true
 # until user click the verification link of verification confirm mail
 #
 # application.use.email.verification = true
+
+# Login form custom input message
+# application.login.page.loginId.placeholder = "Use Emp. no as login id"
+# application.login.page.password.placeholder = ""
 
 # If you enable to use social login or email verification, set followings
 play-easymail {
@@ -157,7 +176,7 @@ application.feedback.url="https://github.com/yona-projects/yona/issues"
 # Mailer
 # ~~~~~~
 # You have to configure SMTP to send mails.
-# Example settings, it assume that you use gamil smtp
+# Example settings, it assume that you use gmail smtp
 smtp.host = smtp.gmail.com
 smtp.port = 465
 smtp.ssl = true
@@ -284,9 +303,18 @@ application.noreferrer = true
 # Display private repositories in the list
 application.displayPrivateRepositories = false
 
+# Hide project listing for security
+application.hide.project.listing = false
+
 # choice: "public" or "private"
 # default: "public"
 project.default.scope.when.create = "public"
+
+# Google Analytics
+# ~~~~~~~~~~~~~~~~~
+# This data is used to better understand how users interact with the Web UI which gives us valuable information
+# in improving Yona user experience. To disable this for any reason, set the following option to false.
+application.send.yona.usage = true
 
 # Github Migration
 # ~~~~~~~~~~~~~~~~~
@@ -301,7 +329,10 @@ github.client.secret = "TYPE YOUR GITHUB CILENT SECRET"
 # 2,147,483,454 bytes = 2Gb
 application.maxFileSize = 2147483454
 
-
+# Project Creation Menu Settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Default: "code, issue, pullRequest, review, milestone, board"
+project.creation.default.menus = "issue, milestone, board"
 
 # Social Login Support
 # ~~~~~~~~~~~~~~~~~~~~
@@ -331,6 +362,15 @@ ldap {
     baseDN = "ou=scientists,dc=example,dc=com"
     # If your ldap service's distinguishedName is 'CN=username,OU=user,DC=abc,DC=com', postfix is 'OU=xxx,DC=abc,DC=com'
     distinguishedNamePostfix = "OU=user,DC=abc,DC=com"
+    loginProperty = "sAMAccountName"
+    displayNameProperty = "displayName"
+    userNameProperty = "CN"
+    emailProperty = "mail"
+    options {
+      # If your LDAP configuration support email login
+      useEmailBaseLogin = false
+      fallbackToLocalLogin = false
+    }
 }
 
 include "social-login.conf"

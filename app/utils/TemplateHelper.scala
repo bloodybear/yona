@@ -638,4 +638,10 @@ object TemplateHelper {
   def userInfo(loginId: String) = {
     Config.getContextRoot() + loginId
   }
+
+  def containsInDefaultMenus(menuName: String) = {
+    val menus = play.Configuration.root.getString("project.default.menus.when.create", "code, issue, pullRequest, review, milestone, board").replaceAll(" ", "").split(",")
+    menus.toStream.contains(menuName)
+
+  }
 }

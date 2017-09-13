@@ -141,8 +141,12 @@ abstract public class AbstractPosting extends Model implements ResourceConvertib
 
     @Transactional
     public void update() {
-        numOfComments = computeNumOfComments();
-        super.update();
+        try {
+            numOfComments = computeNumOfComments();
+            super.update();
+        } catch (PersistenceException ole) {
+            play.Logger.warn("PersistenceException: " + ole.getMessage());
+        }
         updateMention();
     }
 
