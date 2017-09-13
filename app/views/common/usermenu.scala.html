@@ -37,6 +37,36 @@
     }
 }
 
+@noticeProject = @{
+    Project.findByOwnerAndProjectName(DevFarm.ORGANIZATION_NAME, DevFarm.NOTICE_PROJECT_NAME)
+}
+
+@techProject = @{
+    Project.findByOwnerAndProjectName(DevFarm.ORGANIZATION_NAME, DevFarm.TECH_PROJECT_NAME)
+}
+
+@bbsProject = @{
+    Project.findByOwnerAndProjectName(DevFarm.ORGANIZATION_NAME, DevFarm.BBS_PROJECT_NAME)
+}
+
+@qnaProject = @{
+    Project.findByOwnerAndProjectName(DevFarm.ORGANIZATION_NAME, DevFarm.QNA_PROJECT_NAME)
+}
+
+@renderProjectMenu(project: Project) = {
+    @if( project != null ) {
+        <li class="gnb-usermenu-item">
+            <a href="@routes.BoardApp.posts(DevFarm.ORGANIZATION_NAME, project.name)" class="user-item-btn loggged-in">
+                @project.name
+                @if( Posting.countRecentlyCreatedByDaysAgo(project, DevFarm.DAYS_AGO) > 0 ) {
+                    <span class="project-menu-count">N</span>
+                }
+            </a>
+        </li>
+        <li class="divider"></li>
+    }
+}
+
 <div id="mySidenav" class="sidenav">
     <div class="span5 right-menu span-hard-wrap">
         <div class="row-fluid user-menu-wrap">
@@ -69,8 +99,15 @@
         </div>
     </div>
 </div>
+
 <ul class="gnb-usermenu">
     @if( !currentUser.isAnonymous()) {
+       @if( DevFarm.isAdmin(UserApp.currentUser) || DevFarm.isMember(UserApp.currentUser) ) {
+           @renderProjectMenu(noticeProject)
+           @renderProjectMenu(techProject)
+           @renderProjectMenu(bbsProject)
+           @renderProjectMenu(qnaProject)
+       }
        <li class="gnb-usermenu-item hide-in-mobile">
           <a href="@routes.Application.notifications()" class="user-item-btn loggged-in">@Messages("notification")</a>
        </li>
@@ -87,7 +124,7 @@
         </li>
         <li class="divider"></li>
         }
-        @if(DevFarm.isManager(UserApp.currentUser)) {
+        @if(DevFarm.isAdmin(UserApp.currentUser)) {
             <li class="gnb-usermenu-item">
                 <a href="@routes.DfMemberApp.members()" data-toggle="tooltip" title="@Messages("menu.devfarmAdmin")" data-placement="bottom" class="usermenu-icon-button show-progress-bar">
                     <i class="yobicon-wrench"></i>
