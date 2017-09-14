@@ -102,36 +102,36 @@
 
 <ul class="gnb-usermenu">
     @if( !currentUser.isAnonymous()) {
-       @if( DevFarm.isAdmin(UserApp.currentUser) || DevFarm.isMember(UserApp.currentUser) ) {
+        @if( DevFarm.isAdmin(UserApp.currentUser) || DevFarm.isMember(UserApp.currentUser) ) {
            @renderProjectMenu(noticeProject)
            @renderProjectMenu(techProject)
            @renderProjectMenu(bbsProject)
            @renderProjectMenu(qnaProject)
-       }
-       <li class="gnb-usermenu-item hide-in-mobile">
-          <a href="@routes.Application.notifications()" class="user-item-btn loggged-in">@Messages("notification")</a>
-       </li>
-       <li class="divider hide-in-mobile"></li>
-       <li class="gnb-usermenu-item" data-toggle="tooltip" data-placement="bottom" title="@Messages("title.shortcut") (A)">
-           <a href="@routes.IssueApp.userIssues()" class="user-item-btn loggged-in">@Messages("issue.myIssue")@myOpenIssueCount</a>
+        }
+        <li class="gnb-usermenu-item hide-in-mobile">
+            <a href="@routes.Application.notifications()" class="user-item-btn loggged-in">@Messages("notification")</a>
+        </li>
+        <li class="divider hide-in-mobile"></li>
+        <li class="gnb-usermenu-item" data-toggle="tooltip" data-placement="bottom" title="@Messages("title.shortcut") (A)">
+            <a href="@routes.IssueApp.userIssues()" class="user-item-btn loggged-in">@Messages("issue.myIssue")@myOpenIssueCount</a>
         </li>
         <li class="divider"></li>
         @if(currentUser.isSiteManager) {
-        <li class="gnb-usermenu-item">
-            <a href="@routes.SiteApp.userList()" data-toggle="tooltip" title="@Messages("menu.siteAdmin")" data-placement="bottom" class="usermenu-icon-button show-progress-bar">
-                <i class="yobicon-wrench"></i>
-            </a>
-        </li>
-        <li class="divider"></li>
+            <li class="gnb-usermenu-item">
+                <a href="@routes.SiteApp.userList()" data-toggle="tooltip" title="@Messages("menu.siteAdmin")" data-placement="bottom" class="usermenu-icon-button show-progress-bar">
+                    <i class="yobicon-wrench"></i>
+                </a>
+            </li>
+            <li class="divider"></li>
         }
-        @if(DevFarm.isAdmin(UserApp.currentUser)) {
+@*        @if(DevFarm.isAdmin(UserApp.currentUser)) {
             <li class="gnb-usermenu-item">
                 <a href="@routes.DfMemberApp.members()" data-toggle="tooltip" title="@Messages("menu.devfarmAdmin")" data-placement="bottom" class="usermenu-icon-button show-progress-bar">
                     <i class="yobicon-wrench"></i>
                 </a>
             </li>
             <li class="divider"></li>
-        }
+        }*@
         <li class="gnb-usermenu-dropdown" id="sidebar-open-btn">
             <a href="javascript:void(0);" class="gnb-dropdown-toggle" data-toggle="tooltip" data-placement="bottom" title="@Messages("user.menu"), @Messages("title.shortcut") (F)">
                 <span class="avatar-wrap smaller">
