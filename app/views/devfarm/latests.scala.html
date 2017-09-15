@@ -3,6 +3,14 @@
 
 @import utils.MenuType._
 
+@noticeProject = @{
+    Project.findByOwnerAndProjectName(DevFarm.ORGANIZATION_NAME, DevFarm.NOTICE_PROJECT_NAME)
+}
+
+@noticePosts = @{
+    Posting.findRecentlyCreated(noticeProject, DevFarm.ITEMS_LATEST)
+}
+
 @siteLayout(Messages("devfarm.latest"), SITE_HOME) {
 
     <div>
@@ -11,6 +19,13 @@
     <div class="page-wrap-outer">
         <div class="page-wrap">
             @views.html.common.mySeriesMenuTab(TAB_LATESTS)
+
+            <ul class="post-list-wrap">
+            @for(post <- noticePosts) {
+                @views.html.board.partial_list(post, noticeProject)
+            }
+            </ul>
+
         </div>
     </div>
     <script type="text/javascript" src="@routes.Assets.at("javascripts/lib/jquery.pageslide.js")"></script>
