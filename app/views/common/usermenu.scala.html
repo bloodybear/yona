@@ -109,6 +109,10 @@
            @renderProjectMenu(qnaProject)
         }
         <li class="gnb-usermenu-item hide-in-mobile">
+            <a href="@routes.DevFarm.latests()" class="user-item-btn loggged-in">@Messages("devfarm.latests")</a>
+        </li>
+        <li class="divider hide-in-mobile"></li>
+        <li class="gnb-usermenu-item hide-in-mobile">
             <a href="@routes.Application.notifications()" class="user-item-btn loggged-in">@Messages("notification")</a>
         </li>
         <li class="divider hide-in-mobile"></li>
@@ -126,7 +130,7 @@
         }
 @*        @if(DevFarm.isAdmin(UserApp.currentUser)) {
             <li class="gnb-usermenu-item">
-                <a href="@routes.DfMemberApp.members()" data-toggle="tooltip" title="@Messages("menu.devfarmAdmin")" data-placement="bottom" class="usermenu-icon-button show-progress-bar">
+                <a href="@routes.DfMemberApp.members()" data-toggle="tooltip" title="@Messages("devfarm.admin")" data-placement="bottom" class="usermenu-icon-button show-progress-bar">
                     <i class="yobicon-wrench"></i>
                 </a>
             </li>

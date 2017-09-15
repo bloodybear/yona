@@ -20,6 +20,7 @@
 # - user
 # - userinfo
 # - validation
+# - devfarm
 #
 app.description = Web-based platform for collaborative software development
 app.name = Yona
@@ -368,7 +369,6 @@ menu.issue = Issue
 menu.pullRequest = Pull request
 menu.review = Review
 menu.siteAdmin = Site administration
-menu.devfarmAdmin = DevFarm administration
 milestone = Milestone
 milestone.close = Close milestone
 milestone.delete = Delete milestone
@@ -1051,3 +1051,6 @@ viaEmail.help.intro = We provide the guide on how to send an email to {0}. I hop
 viaEmail.help.title = How to use {0} by Email
 watchers = People watching this article
 watchers.more = and {0} others
+devfarm = DevFarm
+devfarm.admin = devfarm administration
+devfarm.latests = latests

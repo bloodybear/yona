@@ -3,6 +3,8 @@ package controllers;
 import models.Organization;
 import models.User;
 import play.mvc.Controller;
+import play.mvc.Result;
+import views.html.devfarm.*;
 
 public class DevFarm extends Controller {
 
@@ -25,4 +27,7 @@ public class DevFarm extends Controller {
         return user.isMemberOf(getOrganization());
     }
 
+    public static Result latests() {
+        return ok(latests.render());
+    }
 }

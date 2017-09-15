@@ -20,6 +20,7 @@
 # - user
 # - userinfo
 # - validation
+# - devfarm
 #
 app.description = ウェブ基盤のソフト開発プラットフォーム
 app.name = Yobi
@@ -627,3 +628,6 @@ validation.required = 必須項目です
 validation.reservedWord = 予約語は使用できません
 validation.retypePassword = パスワードをもう一回入力してください
 validation.tooShortPassword = パスワードは４文字以上にしてください
+devfarm = デブパム
+devfarm.admin = デブパム管理
+devfarm.latests = latests

@@ -20,6 +20,7 @@
 # - user
 # - userinfo
 # - validation
+# - devfarm
 #
 app.description = 21세기 소프트웨어 개발 플랫폼
 app.name = Yona
@@ -368,7 +369,6 @@ menu.issue = 이슈
 menu.pullRequest = 코드 주고받기
 menu.review = 리뷰
 menu.siteAdmin = 사이트 관리
-menu.devfarmAdmin = 데브팜 관리
 milestone = 마일스톤
 milestone.close = 마일스톤 종료
 milestone.delete = 마일스톤 삭제
@@ -1050,3 +1050,6 @@ viaEmail.help.intro = {0}에 이메일을 보내는 방법에 대한 도움말�
 viaEmail.help.title = 이메일로 {0} 사용하는 법
 watchers = 이 글을 지켜보는 사람
 watchers.more = 외 {0}명
+devfarm = 데브팜
+devfarm.admin = 데브팜 관리
+devfarm.latests = 최신글

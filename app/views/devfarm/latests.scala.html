@@ -1,0 +1,33 @@
+
+@()
+
+@import utils.MenuType._
+
+@siteLayout(Messages("devfarm.latest"), SITE_HOME) {
+
+    <div>
+        <button class="btn-transparent" id="toggleIntro"></button>
+    </div>
+    <div class="page-wrap-outer">
+        <div class="page-wrap">
+            @views.html.common.mySeriesMenuTab(TAB_LATESTS)
+        </div>
+    </div>
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/lib/jquery.pageslide.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/service/yona.twoColumnMode.js")"></script>
+    <script type="text/javascript">
+            $(function(){
+                var $setDefaultLoginPage = $("#setDefaultLoginPage");
+                $setDefaultLoginPage.on('click', function(){
+                    $.post("@routes.UserApp.setDefaultLoginPage()?path=" + $setDefaultLoginPage.data("url"))
+                            .done(function (data) {
+                                $yobi.notify("Set to default: " + data.defaultLoginPage, 3000);
+                                $setDefaultLoginPage.hide();
+                            })
+                            .fail(function (data) {
+                                $yobi.alert("set Default page failed: " + data);
+                            });
+                });
+            });
+    </script>
+}
