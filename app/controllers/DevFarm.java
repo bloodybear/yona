@@ -1,11 +1,13 @@
 package controllers;
 
+import controllers.annotation.AnonymousCheck;
 import models.Organization;
 import models.User;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.devfarm.*;
 
+@AnonymousCheck
 public class DevFarm extends Controller {
 
     public static String ORGANIZATION_NAME = play.Configuration.root().getString("application.devfarm.organization.name", "DevFarm");
