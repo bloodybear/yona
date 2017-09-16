@@ -35,7 +35,7 @@
 
                     @if( DevFarm.isAdmin(UserApp.currentUser) || DevFarm.isMember(UserApp.currentUser) ) {
                         <div class="title_area">
-                            <h2 class="pull-left">@noticeProject.name</h2>
+                            <h3 class="pull-left">@noticeProject.name</h3>
                         </div>
                         <ul class="post-list-wrap">
                         @for(post <- noticePosts) {
