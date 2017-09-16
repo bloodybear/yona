@@ -1054,3 +1054,4 @@ watchers.more = and {0} others
 devfarm = DevFarm
 devfarm.admin = devfarm administration
 devfarm.latests = latests
+devfarm.forbidden = You are not {0} group member.

@@ -631,3 +631,4 @@ validation.tooShortPassword = パスワードは４文字以上にしてくだ�
 devfarm = デブパム
 devfarm.admin = デブパム管理
 devfarm.latests = latests
+devfarm.forbidden = You are not {0} group member.
