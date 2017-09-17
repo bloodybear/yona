@@ -151,7 +151,6 @@ POST           /sites/setAttachmentToUserAvatar                                 
 
 # DevFarm
 GET            /df/members                                                            controllers.DfMemberApp.members()
-GET            /df/usageList                                                          controllers.DfUsageApp.usageList()
 GET            /df/latests                                                            controllers.DevFarm.latests()
 
 # Attachments

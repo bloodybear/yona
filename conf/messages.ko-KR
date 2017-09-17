@@ -1054,3 +1054,4 @@ devfarm = 데브팜
 devfarm.admin = 데브팜 관리
 devfarm.latests = 최신글
 devfarm.forbidden = {0} 그룹 멤버가 아닙니다.
+devfarm.mng.sidebar.member = 구성원

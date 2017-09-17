@@ -31,7 +31,7 @@ public class DfMember extends Model {
     public String teamName;
 
     @Formats.DateTime(pattern = "yyyy-MM-dd")
-    public Date createdDatetime;
+    public Date createDatetime;
 
     public DfMember() {
     }
@@ -43,7 +43,7 @@ public class DfMember extends Model {
 
         DfMember member = new DfMember();
         member.user = organizationUser.user;
-        member.createdDatetime = JodaDateUtil.now();
+        member.createDatetime = JodaDateUtil.now();
         member.save();
     }
 }

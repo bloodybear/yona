@@ -1,33 +1,11 @@
 
 @(organizationName: String)
 
-@siteLayout("memberList", utils.MenuType.NONE) {
+@devfarmMngLayout(organizationName) {
 
   <div>
-    <span>memberList</span>
+    <span>members</span>
     <span>@organizationName</span>
   </div>
-
-  <div>
-
-    <div class="inner-bubble">
-      <form class="nm" action="" method="post" id="addNewMember">
-        <input type="text" class="text uname" id="loginId" name="loginId" required="required"
-        data-provider="typeahead" autocomplete="off"
-        placeholder="@Messages("project.members.addMember")"
-        pattern="^[a-zA-Z0-9-]+([_.][a-zA-Z0-9-]+)*$" title="@Messages("user.wrongloginId.alert")" />
-        <button type="submit" class="ybtn ybtn-success"><i class="yobicon-addfriend"></i> @Messages("button.add")</button>
-      </form>
-    </div>
-
-  </div>
-
-  <script type="text/javascript">
-          $(document).ready(function(){
-            $yobi.loadModule("project.Member", {
-              "sActionURL": "@routes.UserApp.users()"
-            });
-          });
-  </script>
 
 }

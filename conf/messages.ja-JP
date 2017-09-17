@@ -632,3 +632,4 @@ devfarm = デブパム
 devfarm.admin = デブパム管理
 devfarm.latests = latests
 devfarm.forbidden = You are not {0} group member.
+devfarm.mng.sidebar.member = member

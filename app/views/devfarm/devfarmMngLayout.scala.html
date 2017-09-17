@@ -1,0 +1,36 @@
+
+@(title: String)(content: Html)
+
+@isActiveMenu(calls: Call*) = @{
+  var menuState = ""
+  for(call <- calls) {
+    if(call.toString().equals(requestHeader.path)) {
+      menuState = "active"
+    }
+  }
+  menuState
+}
+
+@siteLayout(Messages(title), utils.MenuType.DEVFARM_SETTING) {
+  <div class="site-breadcrumb-outer">
+    <div class="site-breadcrumb-inner">
+      <h3>@Messages("devfarm.admin")</h3>
+    </div>
+  </div>
+  <div class="page-wrap-outer">
+    <div class="site-setting-wrap">
+      <div class="row-fluid">
+        <div class="span2">
+          <ul class="site-setting-nav">
+            <li class="@isActiveMenu(routes.DfMemberApp.members())">
+              <a href="@routes.DfMemberApp.members()">@Messages("devfarm.mng.sidebar.member")</a>
+            </li>
+          </ul>
+        </div>
+        <div class="span10">
+        @content
+        </div>
+      </div>
+    </div>
+  </div>
+}

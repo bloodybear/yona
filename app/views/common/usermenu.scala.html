@@ -116,14 +116,14 @@
             </li>
             <li class="divider"></li>
         }
-@*        @if(DevFarm.isAdmin(UserApp.currentUser)) {
+        @if(DevFarm.isAdmin(UserApp.currentUser)) {
             <li class="gnb-usermenu-item">
                 <a href="@routes.DfMemberApp.members()" data-toggle="tooltip" title="@Messages("devfarm.admin")" data-placement="bottom" class="usermenu-icon-button show-progress-bar">
                     <i class="yobicon-wrench"></i>
                 </a>
             </li>
             <li class="divider"></li>
-        }*@
+        }
         <li class="gnb-usermenu-dropdown" id="sidebar-open-btn">
             <a href="javascript:void(0);" class="gnb-dropdown-toggle" data-toggle="tooltip" data-placement="bottom" title="@Messages("user.menu"), @Messages("title.shortcut") (F)">
                 <span class="avatar-wrap smaller">
