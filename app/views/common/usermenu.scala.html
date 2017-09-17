@@ -118,7 +118,7 @@
         }
         @if(DevFarm.isAdmin(UserApp.currentUser)) {
             <li class="gnb-usermenu-item">
-                <a href="@routes.DfMemberApp.members()" data-toggle="tooltip" title="@Messages("devfarm.admin")" data-placement="bottom" class="usermenu-icon-button show-progress-bar">
+                <a href="@routes.DfManagerApp.members()" data-toggle="tooltip" title="@Messages("devfarm.admin")" data-placement="bottom" class="usermenu-icon-button show-progress-bar">
                     <i class="yobicon-wrench"></i>
                 </a>
             </li>

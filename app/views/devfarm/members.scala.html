@@ -1,11 +1,84 @@
 
-@(organizationName: String)
+@(message: String, currentPage: com.avaje.ebean.Page[DfMember], query: String)
 
-@devfarmMngLayout(organizationName) {
+@import utils.JodaDateUtil._
+@import utils.TemplateHelper._
+@import org.apache.commons.lang3.StringUtils
 
-  <div>
-    <span>members</span>
-    <span>@organizationName</span>
+@devfarmMngLayout(message) {
+
+  <div class="title_area">
+    <h2 class="pull-left">@Messages("devfarm.mng.sidebar.member")</h2>
+    <form class="form-search pull-right" action="@routes.DfManagerApp.members()">
+      <div class="search-bar">
+        <input class="textbox" name="query" type="text" placeholder="@Messages("devfarm.mng.members.search")" value="@query">
+        <button type="submit" class="search-btn"><i class="yobicon-search"></i></button>
+      </div>
+    </form>
   </div>
 
+  <div class="row-fluid listhead">
+    <div class="span3 listhead-title">
+      <strong>@Messages("user.name")</strong>
+    </div>
+    <div class="span2 listhead-title">
+      <strong>@Messages("devfarm.team")</strong>
+    </div>
+    <div class="span3 listhead-title">
+      <strong>@Messages("user.email")</strong>
+    </div>
+    <div class="span4 listhead-title">
+      <strong>@Messages("userinfo.since")</strong>
+    </div>
+  </div>
+
+  <ul class="user-list-wrap">
+    @for(member <- currentPage.getList) {
+      <li class="row-fluid listitem">
+        <div class="span3 listitem-col">
+          <a href="@routes.UserApp.userInfo(member.user.loginId)" class="avatar-wrap list-avatar">
+          @if(member.user.avatarUrl == UserApp.DEFAULT_AVATAR_URL){
+            <img src="@urlToPicture(member.user.email, 32)">
+          } else {
+            <img src="@member.user.avatarUrl" alt="@member.user.name" width="32" height="32"/>
+          }
+          </a>
+          <a href="@routes.UserApp.userInfo(member.user.loginId)" class="user-name">
+          @member.user.name
+          </a>
+          <a href="@routes.UserApp.userInfo(member.user.loginId)" class="user-id">
+            @{"@"}@member.user.loginId
+          </a>
+        </div>
+        <div class="span2 listitem-col">
+          @if( StringUtils.isEmpty(member.teamName) ) {
+            <span class="nullteam">null</span>
+          } else {
+            <span class="team">@member.teamName</span>
+          }
+        </div>
+        <div class="span3 listitem-col">
+          <span class="email">@member.user.email</span>
+        </div>
+        <div class="span4 listitem-col created-date">
+          <span>@socialDate(member.user.createdDate)</span>
+        </div>
+      </li>
+    }
+  </ul>
+
+  <style type="text/css">
+    .site-setting-wrap .listitem .listitem-col .team {
+      font-size: 13px;
+      line-height: 43px;
+    }
+    .site-setting-wrap .listitem .listitem-col .nullteam {
+      display: block;
+      margin-left: 5px;
+      font-size: 13px;
+      color: #999;
+      line-height: 43px;
+      font-style: italic;
+    }
+  </style>
 }

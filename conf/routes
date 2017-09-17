@@ -150,7 +150,7 @@ GET            /sites/noAvatarUsers                                             
 POST           /sites/setAttachmentToUserAvatar                                       controllers.SiteApp.setAttachmentToUserAvatar()
 
 # DevFarm
-GET            /df/members                                                            controllers.DfMemberApp.members()
+GET            /df/manager/members                                                    controllers.DfManagerApp.members(pageNum: Int ?= 1, query: String ?= null)
 GET            /df/latests                                                            controllers.DevFarm.latests()
 
 # Attachments

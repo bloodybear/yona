@@ -1056,3 +1056,5 @@ devfarm.admin = devfarm administration
 devfarm.latests = latests
 devfarm.forbidden = You are not {0} group member.
 devfarm.mng.sidebar.member = member
+devfarm.mng.members.search = 찾으려는 구성원의 ID, 이름, 팀 또는 이메일을 입력하세요
+devfarm.team = team
