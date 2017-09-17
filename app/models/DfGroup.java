@@ -67,4 +67,17 @@ public class DfGroup extends Model {
         group.createDatetime = JodaDateUtil.now();
         group.save();
     }
+
+    public static Page<DfGroup> findDfGroups(int pageNum, DfGroupState state, String query) {
+        ExpressionList<DfGroup> el = find.where();
+        el.isNull("currentGroup").eq("stateCode", state);
+
+        if (StringUtils.isNotBlank(query)) {
+            el = el.disjunction();
+            el = el.icontains("name", query);
+            el.endJunction();
+        }
+
+        return el.order().desc("createDatetime").findPagingList(COUNT_PER_PAGE).getPage(pageNum);
+    }
 }

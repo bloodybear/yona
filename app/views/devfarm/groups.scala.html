@@ -1,9 +1,14 @@
 
-@(message: String)
+@(message: String, currentPage: com.avaje.ebean.Page[DfGroup], groupState: DfGroupState, query: String)
 
+@import models.enumeration.DfGroupState
 @import utils.JodaDateUtil._
 @import utils.TemplateHelper._
 @import org.apache.commons.lang3.StringUtils
+
+@isActiveTabMenu(state: DfGroupState) =@{
+  if(state==groupState) {"active"}
+}
 
 @devfarmMngLayout(message) {
 
@@ -17,18 +22,46 @@
     </form>
   </div>
 
+  <ul class="nav nav-tabs">
+    <li class="@isActiveTabMenu(DfGroupState.READY)"><a href="@routes.DfManagerApp.groups()?state=@DfGroupState.READY.name">@Messages("devfarm.group.state.ready")</a></li>
+    <li class="@isActiveTabMenu(DfGroupState.IN_PROGRESS)"><a href="@routes.DfManagerApp.groups()?state=@DfGroupState.IN_PROGRESS.name">@Messages("devfarm.group.state.inProgress")</a></li>
+    <li class="@isActiveTabMenu(DfGroupState.COMPLETED)"><a href="@routes.DfManagerApp.groups()?state=@DfGroupState.COMPLETED.name">@Messages("devfarm.group.state.completed")</a></li>
+    <li class="@isActiveTabMenu(DfGroupState.DROPPED)"><a href="@routes.DfManagerApp.groups()?state=@DfGroupState.DROPPED.name">@Messages("devfarm.group.state.dropped")</a></li>
+  </ul>
+
   <div class="row-fluid listhead">
-    <div class="span3 listhead-title">
-      <strong>@Messages("user.name")</strong>
-    </div>
-    <div class="span2 listhead-title">
-      <strong>@Messages("devfarm.team")</strong>
-    </div>
-    <div class="span3 listhead-title">
-      <strong>@Messages("user.email")</strong>
+    <div class="span4 listhead-title">
+      <strong>@Messages("devfarm.group.name")</strong>
     </div>
     <div class="span4 listhead-title">
+      <strong>@Messages("devfarm.group.member")</strong>
+    </div>
+    <div class="span2 listhead-title">
+      <strong>@Messages("devfarm.group.state")</strong>
+    </div>
+    <div class="span2 listhead-title">
       <strong>@Messages("userinfo.since")</strong>
     </div>
   </div>
+
+  <ul class="project-list-wrap">
+  @for(group <- currentPage.getList) {
+    <li class="row-fluid listitem">
+      <div class="span4 listitem-col">
+        <a href="@routes.ProjectApp.project(group.project.owner,group.project.name)" class="avatar-wrap list-avatar">
+          <img src="@urlToProjectLogo(group.project)" alt="@group.project.name"/> @group.project.owner/@group.project.name
+        </a>
+        <a href="@routes.ProjectApp.project(group.project.owner,group.project.name)" class="project-name">
+          @group.project.owner/@group.project.name
+        </a>
+      </div>
+      <div class="span4 listitem-col">
+      </div>
+      <div class="span2 listitem-col">
+      </div>
+      <div class="span2 listitem-col">
+      </div>
+    </li>
+  }
+  </ul>
 }
