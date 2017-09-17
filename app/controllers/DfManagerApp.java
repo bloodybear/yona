@@ -17,4 +17,8 @@ public class DfManagerApp extends Controller {
         Page<DfMember> dfMembers = DfMember.findDfMembers(pageNum -1, query);
         return ok(members.render("devfarm.mng.sidebar.member", dfMembers, query));
     }
+
+    public static Result groups() {
+        return ok(groups.render("devfarm.mng.sidebar.group"));
+    }
 }

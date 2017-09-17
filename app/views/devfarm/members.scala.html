@@ -8,7 +8,7 @@
 @devfarmMngLayout(message) {
 
   <div class="title_area">
-    <h2 class="pull-left">@Messages("devfarm.mng.sidebar.member")</h2>
+    <h2 class="pull-left">@Messages(message)</h2>
     <form class="form-search pull-right" action="@routes.DfManagerApp.members()">
       <div class="search-bar">
         <input class="textbox" name="query" type="text" placeholder="@Messages("devfarm.mng.members.search")" value="@query">

@@ -32,18 +32,15 @@ public class DfMember extends Model {
     public Long id;
 
     @ManyToOne
-    public User user;
+    public DfMember currentMember;
 
     @ManyToOne
-    public DfMember currentMember;
+    public User user;
 
     public String teamName;
 
     @Formats.DateTime(pattern = "yyyy-MM-dd")
     public Date createDatetime;
-
-    public DfMember() {
-    }
 
     public static void addMember(OrganizationUser organizationUser) {
         if (!organizationUser.organization.equals(DevFarm.getOrganization())) {
@@ -58,7 +55,7 @@ public class DfMember extends Model {
 
     public static Page<DfMember> findDfMembers(int pageNum, String query) {
         ExpressionList<DfMember> el = find.where();
-        el.isNull("currentMember");
+        el.isNull("currentMember").eq("user.state", UserState.ACTIVE);
 
         if (StringUtils.isNotBlank(query)) {
             el = el.disjunction();

@@ -151,6 +151,7 @@ POST           /sites/setAttachmentToUserAvatar                                 
 
 # DevFarm
 GET            /df/manager/members                                                    controllers.DfManagerApp.members(pageNum: Int ?= 1, query: String ?= null)
+GET            /df/manager/groups                                                     controllers.DfManagerApp.groups()
 GET            /df/latests                                                            controllers.DevFarm.latests()
 
 # Attachments

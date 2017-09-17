@@ -1055,5 +1055,6 @@ devfarm.admin = 데브팜 관리
 devfarm.latests = 최신글
 devfarm.forbidden = {0} 그룹 멤버가 아닙니다.
 devfarm.mng.sidebar.member = 구성원
+devfarm.mng.sidebar.group = 역량강화그룹
 devfarm.mng.members.search = 찾으려는 구성원의 ID, 이름, 팀 또는 이메일을 입력하세요
 devfarm.team = 팀
