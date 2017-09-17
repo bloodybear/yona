@@ -142,7 +142,7 @@ public class OrganizationUser extends Model {
         organizationUser.role = Role.findById(roleId);
         organizationUser.save();
 
-        //DfMember.addMember(organizationUser);
+        DfMember.addMember(organizationUser);
     }
 
     public static void delete(Long organizationId, Long userId) {
