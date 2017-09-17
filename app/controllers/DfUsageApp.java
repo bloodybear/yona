@@ -5,7 +5,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.devfarm.*;
 
-@AnonymousCheck
+@AnonymousCheck(requiresLogin = true)
 public class DfUsageApp extends Controller {
 
     public static Result usageList() {

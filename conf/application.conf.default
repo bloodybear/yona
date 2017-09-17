@@ -43,7 +43,7 @@ application.guest.user.login.id.prefix = ""
 # If you wants to make the user available to use yona
 # after the server administrator approved,uncomment below
 #
-signup.require.admin.confirm = true
+signup.require.admin.confirm = false
 
 # If you only want to allow for signing up in specific email domains,
 # use the following option.
