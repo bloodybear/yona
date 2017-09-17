@@ -375,6 +375,7 @@ ldap {
 
 # DevFarm
 application.devfarm.organization.name = "DevFarm"
+application.devfarm.project.request.name = "역량강화신청"
 application.devfarm.project.notice.name = "공지사항"
 application.devfarm.project.tech.name = "Tech-Tip"
 application.devfarm.project.bbs.name = "자유게시판"

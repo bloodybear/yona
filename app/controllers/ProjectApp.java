@@ -187,6 +187,8 @@ public class ProjectApp extends Controller {
         Project project = filledNewProjectForm.get();
         if (Organization.isNameExist(owner)) {
             project.organization = organization;
+
+            DfGroup.addGroup(project);
         }
         ProjectUser.assignRole(user.id, Project.create(project), RoleType.MANAGER);
         RepositoryService.createRepository(project);

@@ -18,6 +18,7 @@ import java.util.List;
 public class DevFarm extends Controller {
 
     public static String ORGANIZATION_NAME = play.Configuration.root().getString("application.devfarm.organization.name", "DevFarm");
+    public static String REQUEST_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.request.name");
     public static String NOTICE_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.notice.name");
     public static String TECH_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.tech.name");
     public static String BBS_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.bbs.name");
@@ -36,6 +37,25 @@ public class DevFarm extends Controller {
 
     public static boolean isMember(User user) {
         return user.isMemberOf(getOrganization());
+    }
+
+    public static boolean isReservedProject(@Nonnull String projectName) {
+        if (projectName.equals(REQUEST_PROJECT_NAME)) {
+            return true;
+        }
+        if (projectName.equals(NOTICE_PROJECT_NAME)) {
+            return true;
+        }
+        if (projectName.equals(TECH_PROJECT_NAME)) {
+            return true;
+        }
+        if (projectName.equals(BBS_PROJECT_NAME)) {
+            return true;
+        }
+        if (projectName.equals(QNA_PROJECT_NAME)) {
+            return true;
+        }
+        return false;
     }
 
     public static Result latests() {

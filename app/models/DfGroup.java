@@ -50,4 +50,21 @@ public class DfGroup extends Model {
     @Formats.DateTime(pattern = "yyyy-MM-dd")
     public Date createDatetime;
 
+    public static void addGroup(Project project) {
+        if (project.organization == null || !project.organization.equals(DevFarm.getOrganization())) {
+            return;
+        }
+        if (DevFarm.isReservedProject(project.name)) {
+            return;
+        }
+
+        DfGroup group = new DfGroup();
+        group.project = project;
+        group.stateCode = DfGroupState.READY;
+        group.name = project.name;
+        group.startDate = JodaDateUtil.now();
+        group.endDate = JodaDateUtil.now();
+        group.createDatetime = JodaDateUtil.now();
+        group.save();
+    }
 }
