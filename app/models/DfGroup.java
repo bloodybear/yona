@@ -16,6 +16,7 @@ import play.data.format.Formats;
 import play.db.ebean.Model;
 import utils.JodaDateUtil;
 
+import javax.annotation.Nonnull;
 import javax.persistence.*;
 import java.util.Date;
 
@@ -79,5 +80,20 @@ public class DfGroup extends Model {
         }
 
         return el.order().desc("createDatetime").findPagingList(COUNT_PER_PAGE).getPage(pageNum);
+    }
+
+    public static void updateGroupName(@Nonnull Project updatedProject) {
+        DfGroup group = find.where().isNull("currentGroup").eq("project", updatedProject).findUnique();
+        if (group == null) return;
+        DfGroup updatedGroup = new DfGroup();
+        updatedGroup.project = updatedProject;
+        updatedGroup.stateCode = group.stateCode;
+        updatedGroup.name = updatedProject.name;
+        updatedGroup.startDate = group.startDate;
+        updatedGroup.endDate = group.endDate;
+        updatedGroup.createDatetime = group.createDatetime;
+        updatedGroup.save();
+        group.currentGroup = updatedGroup;
+        group.update();
     }
 }

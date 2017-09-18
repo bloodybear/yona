@@ -269,6 +269,8 @@ public class ProjectApp extends Controller {
                 throw new FileOperationException("fail repository rename to " + project.owner + "/" + updatedProject.name);
             }
             CacheStore.refreshProjectMap();
+
+            DfGroup.updateGroupName(updatedProject);
         }
 
         updatedProject.update();
