@@ -53,7 +53,11 @@
     Project.findByOwnerAndProjectName(DevFarm.ORGANIZATION_NAME, DevFarm.QNA_PROJECT_NAME)
 }
 
-@renderProjectMenu(project: Project) = {
+@requestProject = @{
+    Project.findByOwnerAndProjectName(DevFarm.ORGANIZATION_NAME, DevFarm.REQUEST_PROJECT_NAME)
+}
+
+@renderPostProjectMenu(project: Project) = {
     @if( project != null ) {
         <li class="gnb-usermenu-item">
             <a href="@routes.BoardApp.posts(DevFarm.ORGANIZATION_NAME, project.name)" class="user-item-btn loggged-in">
@@ -61,6 +65,17 @@
                 @if( Posting.countRecentlyCreatedByDaysAgo(project, DevFarm.DAYS_AGO) > 0 ) {
                     <span class="project-menu-count">N</span>
                 }
+            </a>
+        </li>
+        <li class="divider"></li>
+    }
+}
+
+@renderIssueProjectMenu(project: Project) = {
+    @if( project != null ) {
+        <li class="gnb-usermenu-item">
+            <a href="@routes.IssueApp.issues(DevFarm.ORGANIZATION_NAME, project.name)" class="user-item-btn loggged-in">
+            @project.name
             </a>
         </li>
         <li class="divider"></li>
@@ -103,10 +118,11 @@
 <ul class="gnb-usermenu">
     @if( !currentUser.isAnonymous()) {
         @if( DevFarm.isAdmin(UserApp.currentUser) || DevFarm.isMember(UserApp.currentUser) ) {
-           @renderProjectMenu(noticeProject)
-           @renderProjectMenu(techProject)
-           @renderProjectMenu(bbsProject)
-           @renderProjectMenu(qnaProject)
+            @renderPostProjectMenu(noticeProject)
+            @renderPostProjectMenu(techProject)
+            @renderPostProjectMenu(bbsProject)
+            @renderPostProjectMenu(qnaProject)
+            @renderIssueProjectMenu(requestProject)
         }
         @if(currentUser.isSiteManager) {
             <li class="gnb-usermenu-item">

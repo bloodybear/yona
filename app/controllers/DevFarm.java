@@ -18,6 +18,7 @@ import java.util.List;
 public class DevFarm extends Controller {
 
     public static String ORGANIZATION_NAME = play.Configuration.root().getString("application.devfarm.organization.name", "DevFarm");
+    public static String REQUEST_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.request.name");
     public static String NOTICE_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.notice.name");
     public static String TECH_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.tech.name");
     public static String BBS_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.bbs.name");
