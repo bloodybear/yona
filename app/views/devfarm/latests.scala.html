@@ -37,21 +37,24 @@
             <div class="site-guide-outer hide">
 
                 @if( DevFarm.isAdmin(UserApp.currentUser) || DevFarm.isMember(UserApp.currentUser) ) {
-
-                    <div class="title_area">
-                        <h2 class="pull-left">@noticeProject.name</h2>
-                    </div>
-                    @if( noticePosts.isEmpty() ) {
-                        <div class="error-wrap">
-                            <i class="ico ico-err1"></i>
-                            <p>@Messages("post.is.empty")</p>
+                    @if( noticeProject != null ) {
+                        <div class="title_area">
+                            <h2 class="pull-left">@noticeProject.name</h2>
                         </div>
-                    } else {
-                        <ul class="post-list-wrap">
+                        @if( noticePosts.isEmpty() ) {
+                            <div class="error-wrap">
+                                <i class="ico ico-err1"></i>
+                                <p>@Messages("post.is.empty")</p>
+                            </div>
+                        } else {
+                            <ul class="post-list-wrap">
                             @for(post <- noticePosts) {
                                 @views.html.board.partial_list(post, noticeProject)
                             }
-                        </ul>
+                            </ul>
+                        }
+                    } else {
+
                     }
 
                 } else {
@@ -66,7 +69,7 @@
                                     <button class="ybtn ybtn-small @if(User.enrolled(org)) { ybtn-info } dropdown-toggle" type="button" data-toggle="dropdown">
                                         <i class="yobicon-addfriend"></i> @Messages("organization.member.enrollment.title")
                                     </button>
-                                    <div class="dropdown-menu flat right title">
+                                    <div class="dropdown-menu fㅏㅏlat right title">
                                         <div class="pop-title">@getPopupTitle</div>
                                         <div class="pop-content">
                                         @getEnrollmentHelp
