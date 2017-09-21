@@ -23,7 +23,7 @@
 # - devfarm
 #
 app.description = 21세기 소프트웨어 개발 플랫폼
-app.name = Yona
+app.name = DevFarm
 app.restart.notice = 서버를 재시작해야합니다.
 app.restart.updateSecretYourself = application.secret을 무작위 문자열로 변경해주십시오.
 app.restart.welcome = 환영합니다!
@@ -866,9 +866,9 @@ site.sidebar.userList = 사용자
 site.update.currentVersion = 현재 버전은 {0} 입니다
 site.update.download = 다운로드
 site.update.error = 다음과 같이 에러가 발생하여 업데이트 할 버전을 확인하지 못했습니다.
-site.update.isAvailable = Yona {0} 버전으로 업데이트 할 수 있습니다
+site.update.isAvailable = DevFarm {0} 버전으로 업데이트 할 수 있습니다
 site.update.isNotNecessary = 현재 최신 버전을 사용중입니다
-site.update.notification = 업데이트 알림: Yona {0} 버전이 나왔습니다
+site.update.notification = 업데이트 알림: DevFarm {0} 버전이 나왔습니다
 site.update.notification.hide = 숨기기
 site.user.delete = 사용자 삭제
 site.user.deleteConfirm = 정말로 해당 사용자를 사이트에서 탈퇴시키겠습니까?

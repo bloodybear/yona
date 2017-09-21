@@ -23,7 +23,7 @@
 # - devfarm
 #
 app.description = Web-based platform for collaborative software development
-app.name = Yona
+app.name = DevFarm
 app.restart.notice = Server needs to be restarted.
 app.restart.updateSecretYourself = Please update application.secret with random text.
 app.restart.welcome = Welcome!
@@ -864,12 +864,12 @@ site.sidebar.postList = Posts
 site.sidebar.projectList = Projects
 site.sidebar.update = Software Update
 site.sidebar.userList = Users
-site.update.currentVersion = Current version is Yona {0}
+site.update.currentVersion = Current version is DevFarm {0}
 site.update.download = Download
 site.update.error = Failed to check for updates because of the following error:
-site.update.isAvailable = Yona {0} is available
+site.update.isAvailable = DevFarm {0} is available
 site.update.isNotNecessary = You are using the latest version
-site.update.notification = Software update: Yona {0} is available
+site.update.notification = Software update: DevFarm {0} is available
 site.update.notification.hide = Hide
 site.user.delete = Delete user
 site.user.deleteConfirm = Are you sure you want this user to leave?

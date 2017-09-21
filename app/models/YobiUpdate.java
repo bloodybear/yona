@@ -41,6 +41,8 @@ public class YobiUpdate {
             .getMilliseconds("application.update.notification.interval", 60 * 60 * 1000L);
     private static final String UPDATE_REPOSITORY_URL = Configuration.root()
             .getString("application.update.repositoryUrl", "http://repo.yona.io/yona/yona");
+    private static final String UPDATE_REPOSITORY_TAG_PATH = Configuration.root()
+            .getString("application.update.repositoryTagPath", "refs/tags");
     private static final String RELEASE_URL_FORMAT = Configuration.root()
             .getString("application.update.releaseUrlFormat",
                     "https://github.com/doortts/yona/releases/tag/v%s");
@@ -102,7 +104,7 @@ public class YobiUpdate {
                 .call();
 
         for(Ref ref : refs) {
-            String tag = ref.getName().replaceFirst("^refs/tags/", "");
+            String tag = ref.getName().replaceFirst("^" + UPDATE_REPOSITORY_TAG_PATH + "/", "");
             if (tag.charAt(0) == 'v') {
                 String versionString = Config.semverize(tag);
 
