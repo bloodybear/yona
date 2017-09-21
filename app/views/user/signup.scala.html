@@ -37,6 +37,11 @@
       <p>@Html(Messages("title.signupConfirmDesc2", new StringBuilder(User.findByLoginId(SiteAdmin.SITEADMIN_DEFAULT_LOGINID).email).reverse().toString()))</p>
     </div>
   }
+
+  <div class="center-txt">
+    <p>@Html(Messages("devfarm.signupConfirmDesc", Application.ALLOWED_SENDING_MAIL_DOMAINS))</p>
+  </div>
+
   <div class="signup-form-wrap frm-wrap">
     <form action="@routes.UserApp.newUser()" method="post" name="signup">
     @if(UserApp.useSocialLoginOnly) {

@@ -22,7 +22,7 @@
 # - validation
 # - devfarm
 #
-app.description = 21세기 소프트웨어 개발 플랫폼
+app.description = 마이다스아이티 기술연구소 역량강화 플랫폼
 app.name = DevFarm
 app.restart.notice = 서버를 재시작해야합니다.
 app.restart.updateSecretYourself = application.secret을 무작위 문자열로 변경해주십시오.
@@ -1051,6 +1051,11 @@ viaEmail.help.title = 이메일로 {0} 사용하는 법
 watchers = 이 글을 지켜보는 사람
 watchers.more = 외 {0}명
 devfarm = 데브팜
+devfarm.description = 적합한 환경을 조성해주면 농작물이 스스로 자라듯이 기술연구소 구성원들이 스스로 <strong>성장</strong>할 수 있는 환경을 조성하고 조직을 <strong>활성화</strong> 시키기 위한 모임입니다.
+devfarm.description2 = <strong class="notice">자율/자발</strong> : 우리의 자유의지와 가치관은 존중 받아야 합니다. 스스로 판단하고 행동하며 행동에 책임을 집니다.
+devfarm.description3 = <strong class="notice">소통/공감</strong> : 올바른 방향을 찾기 위해 구성원들의 소리에 귀 기울이며 끊임없이 변화하고 발전해나갑니다.
 devfarm.admin = 데브팜 관리
 devfarm.latests = 최신글
 devfarm.forbidden = {0} 그룹 멤버가 아닙니다.
+devfarm.enroll.message = {0} 에 참여하시려면 그룹 멤버로 등록 요청을 하시기 바랍니다.
+devfarm.signupConfirmDesc = <strong>아이디</strong>는 <strong>자유롭게</strong> 정해서 사용하시면 됩니다.<br><strong>이름</strong>은 반드시 <strong>본명</strong>을 사용해주세요.<br><strong>이메일</strong>은 반드시 <strong></strong> 도메인을 사용해주세요.<br>다른 도메인의 이메일 주소로는 가입이 불가능합니다.<br>또한 이메일 인증을 받아야 정상적으로 사용이 가능합니다.
