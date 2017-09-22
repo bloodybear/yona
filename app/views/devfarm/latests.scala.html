@@ -42,12 +42,12 @@
                     <tr>
                         <td>@Html(Messages("devfarm.description"))</td>
                     </tr>
-                    <tr class="bubble-wrap gray">
-                        <td>@Html(Messages("devfarm.description2"))</td>
-                    </tr>
-                    <tr class="bubble-wrap gray">
-                        <td>@Html(Messages("devfarm.description3"))</td>
-                    </tr>
+                    @*<tr class="bubble-wrap gray">*@
+                        @*<td>@Html(Messages("devfarm.description2"))</td>*@
+                    @*</tr>*@
+                    @*<tr class="bubble-wrap gray">*@
+                        @*<td>@Html(Messages("devfarm.description3"))</td>*@
+                    @*</tr>*@
                 </table>
 
                 @if( DevFarm.isAdmin(UserApp.currentUser) || DevFarm.isMember(UserApp.currentUser) ) {
