@@ -1052,6 +1052,7 @@ viaEmail.help.title = How to use {0} by Email
 watchers = People watching this article
 watchers.more = and {0} others
 devfarm = DevFarm
+devfarm.nogroup = {0} 그룹이 존재하지 않습니다.
 devfarm.description = 적합한 환경을 조성해주면 농작물이 스스로 자라듯이 기술연구소 구성원들이 스스로 <strong>성장</strong>할 수 있는 환경을 조성하고 조직을 <strong>활성화</strong> 시키기 위한 모임입니다.
 devfarm.description2 = <strong class="notice">자율/자발</strong> : 우리의 자유의지와 가치관은 존중 받아야 합니다. 스스로 판단하고 행동하며 행동에 책임을 집니다.
 devfarm.description3 = <strong class="notice">소통/공감</strong> : 올바른 방향을 찾기 위해 구성원들의 소리에 귀 기울이며 끊임없이 변화하고 발전해나갑니다.
