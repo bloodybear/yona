@@ -99,7 +99,7 @@
                 </li>
 
                 <li id="opt-protected" class="mt10" @if(!Organization.isNameExist(newProjectForm.field("owner").value)){ style="display:none;"}>
-                  <input type="radio" id="protected" name="projectScope" value="PROTECTED" class="radio-btn pull-left" @if(newProjectForm.field("projectScope").value == "PROTECTED"){ checked="checked" }>
+                  <input type="radio" id="protected" name="projectScope" value="PROTECTED" class="radio-btn pull-left" @if(newProjectForm.field("projectScope").value == "PROTECTED" || newProjectForm.field("owner").value == DevFarm.ORGANIZATION_NAME ){ checked="checked" }>
                   <label for="protected">
                     <strong class="ml5">@Messages("project.protected")</strong>
                     <p class="note">
