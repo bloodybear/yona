@@ -5,7 +5,7 @@ import play.mvc.{Call, Http}
 import org.joda.time.DateTimeConstants
 import org.apache.commons.io.FilenameUtils
 import play.i18n.Messages
-import controllers.{Application, UserApp, routes}
+import controllers.{Application, DevFarm, UserApp, routes}
 import views.html._
 import java.net.URI
 
@@ -642,6 +642,14 @@ object TemplateHelper {
   def containsInDefaultMenus(menuName: String) = {
     val menus = play.Configuration.root.getString("project.default.menus.when.create", "code, issue, pullRequest, review, milestone, board").replaceAll(" ", "").split(",")
     menus.toStream.contains(menuName)
+  }
 
+  def containsInDefaultMenus(owner: String, menuName: String) = {
+    var conf = "project.default.menus.when.create";
+    if (DevFarm.ORGANIZATION_NAME == owner) {
+      conf = "devfarm.default.menus.when.create";
+    }
+    val menus = play.Configuration.root.getString(conf, "code, issue, pullRequest, review, milestone, board").replaceAll(" ", "").split(",")
+    menus.toStream.contains(menuName)
   }
 }

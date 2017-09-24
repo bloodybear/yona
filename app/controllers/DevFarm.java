@@ -17,12 +17,12 @@ import java.util.List;
 @AnonymousCheck(requiresLogin = true)
 public class DevFarm extends Controller {
 
-    public static String ORGANIZATION_NAME = play.Configuration.root().getString("application.devfarm.organization.name", "DevFarm");
-    public static String REQUEST_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.request.name");
-    public static String NOTICE_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.notice.name");
-    public static String TECH_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.tech.name");
-    public static String BBS_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.bbs.name");
-    public static String QNA_PROJECT_NAME = play.Configuration.root().getString("application.devfarm.project.qna.name");
+    public static String ORGANIZATION_NAME = play.Configuration.root().getString("devfarm.organization.name", "DevFarm");
+    public static String REQUEST_PROJECT_NAME = play.Configuration.root().getString("devfarm.project.request.name");
+    public static String NOTICE_PROJECT_NAME = play.Configuration.root().getString("devfarm.project.notice.name");
+    public static String TECH_PROJECT_NAME = play.Configuration.root().getString("devfarm.project.tech.name");
+    public static String BBS_PROJECT_NAME = play.Configuration.root().getString("devfarm.project.bbs.name");
+    public static String QNA_PROJECT_NAME = play.Configuration.root().getString("devfarm.project.qna.name");
     public static final int DAYS_AGO = 3;
     public static final int NOTICES_LATEST = 5;
     public static final int POSTS_LATEST = 15;

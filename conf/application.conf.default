@@ -375,10 +375,11 @@ ldap {
 }
 
 # DevFarm
-application.devfarm.organization.name = "DevFarm"
-application.devfarm.project.notice.name = "공지사항"
-application.devfarm.project.tech.name = "Tech-Tip"
-application.devfarm.project.bbs.name = "자유게시판"
-application.devfarm.project.qna.name = "QNA"
+devfarm.organization.name = "DevFarm"
+devfarm.project.notice.name = "공지사항"
+devfarm.project.tech.name = "Tech-Tip"
+devfarm.project.bbs.name = "자유게시판"
+devfarm.project.qna.name = "QNA"
+devfarm.default.menus.when.create = "issue, board"
 
 include "social-login.conf"
