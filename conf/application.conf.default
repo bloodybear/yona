@@ -381,5 +381,8 @@ devfarm.project.tech.name = "Tech-Tip"
 devfarm.project.bbs.name = "자유게시판"
 devfarm.project.qna.name = "QNA"
 devfarm.default.menus.when.create = "issue, board"
+# esc
+esc.organization.name = "ESC"
+esc.welcome.show = false
 
 include "social-login.conf"
