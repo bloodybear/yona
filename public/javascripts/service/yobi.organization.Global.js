@@ -35,7 +35,7 @@
          * initialize element variables
          */
         function _initElement() {
-            htElement.welBtnEnroll  = $("#enrollBtn");
+            htElement.welBtnEnroll  = $(".enrollBtn");
         }
 
         /**
