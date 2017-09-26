@@ -82,17 +82,6 @@
     }
 }
 
-@renderIssueProjectMenu(project: Project) = {
-    @if( project != null ) {
-        <li class="gnb-usermenu-item">
-            <a href="@routes.IssueApp.issues(DevFarm.ORGANIZATION_NAME, project.name)" class="user-item-btn loggged-in">
-            @project.name
-            </a>
-        </li>
-        <li class="divider"></li>
-    }
-}
-
 <div id="mySidenav" class="sidenav">
     <div class="span5 right-menu span-hard-wrap">
         <div class="row-fluid user-menu-wrap">
