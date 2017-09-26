@@ -1,9 +1,9 @@
 import com.typesafe.config._
 import java.nio.file.Paths
 
-name := """yona"""
+name := """devfarm"""
 
-version := "1.7.0"
+version := "1.0.0-rc"
 
 libraryDependencies ++= Seq(
   // Add your project dependencies here,

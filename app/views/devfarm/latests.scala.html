@@ -33,25 +33,42 @@
 
     <div class="page-wrap-outer">
         <div class="page-wrap">
-
             <div class="site-guide-outer hide">
 
-                @if( DevFarm.isAdmin(UserApp.currentUser) || DevFarm.isMember(UserApp.currentUser) ) {
+            @if( org != null) {
 
-                    <div class="title_area">
-                        <h2 class="pull-left">@noticeProject.name</h2>
-                    </div>
-                    @if( noticePosts.isEmpty() ) {
-                        <div class="error-wrap">
-                            <i class="ico ico-err1"></i>
-                            <p>@Messages("post.is.empty")</p>
+                <h3>
+                    <span><strong>@Messages("app.welcome",utils.Config.getSiteName)</strong> - @Messages("app.description")</span>
+                </h3>
+                <table class="welcome-table table borderless">
+                    <tr>
+                        <td>@Html(Messages("devfarm.description"))</td>
+                    </tr>
+                    @*<tr class="bubble-wrap gray">*@
+                    @*<td>@Html(Messages("devfarm.description2"))</td>*@
+                    @*</tr>*@
+                    @*<tr class="bubble-wrap gray">*@
+                    @*<td>@Html(Messages("devfarm.description3"))</td>*@
+                    @*</tr>*@
+                </table>
+
+                @if( DevFarm.isAdmin(UserApp.currentUser) || DevFarm.isMember(UserApp.currentUser) ) {
+                    @if( noticeProject != null ) {
+                        <div class="title_area">
+                            <h2 class="pull-left">@noticeProject.name</h2>
                         </div>
-                    } else {
-                        <ul class="post-list-wrap">
+                        @if( noticePosts.isEmpty() ) {
+                            <div class="error-wrap">
+                                <i class="ico ico-err1"></i>
+                                <p>@Messages("post.is.empty")</p>
+                            </div>
+                        } else {
+                            <ul class="post-list-wrap">
                             @for(post <- noticePosts) {
                                 @views.html.board.partial_list(post, noticeProject)
                             }
-                        </ul>
+                            </ul>
+                        }
                     }
 
                 } else {
@@ -59,6 +76,7 @@
                     @if( OrganizationUser.isGuest(org, UserApp.currentUser)) {
                         <div class="error-wrap" style=" padding: 70px 0px 150px 0px">
                             <p>@Messages("devfarm.forbidden", org.name)</p>
+                            <p class="message">@Messages("devfarm.enroll.message", org.name)</p>
                             <div class="project-util-wrap" style="position: absolute;
                                 left: 50%;
                                 transform: translateX(-50%);">
@@ -84,6 +102,17 @@
                     }
 
                 }
+
+            } else {
+
+                <div class="error-wrap">
+                    <p>@Messages("devfarm.nogroup", DevFarm.ORGANIZATION_NAME)</p>
+                    <span><a href="@routes.OrganizationApp.newForm()" class="ybtn ybtn-success">
+                    @Messages("title.newOrganization")
+                    </a></span>
+                </div>
+
+            }
 
             </div>
             <div class="guide-toggle">
@@ -180,6 +209,7 @@
     <style type="text/css">
         .page-wrap .title_area {
             overflow: hidden;
+            margin-top: 14px;
             margin-bottom: 14px;
             padding-bottom: 8px;
             border-bottom: 1px solid #ddd;
@@ -200,6 +230,21 @@
         #latests-more {
             margin-top: 20px;
             width: 95%;
+        }
+        h3 strong {
+            font-size: 1.3em;
+            color: #FF7332;
+        }
+        .welcome-table strong {
+            color: #3592b5;
+        }
+        .welcome-table .bubble-wrap strong {
+            color: #FF7332;
+        }
+        .error-wrap p.message {
+            font-weight: normal;
+            font-size: 14px;
+            margin: 20px 0;
         }
     </style>
 

@@ -254,9 +254,10 @@ application.update.notification.interval = 6h
 # A url to the git repository for Yona releases.
 application.update.check.use = true
 application.update.repositoryUrl = "https://github.com/bloodybear/yona"
+application.update.repositoryTagPath = "refs/tags/devfarm"
 # A format to construct the url to latest Yona release. "%s" is a format
 # specifier for Yona version to download like "0.5.7".
-application.update.releaesUrlFormat = "https://github.com/yona-projects/yona/releases/tag/devfarm/v%s"
+application.update.releaseUrlFormat = "https://github.com/bloodybear/yona/releases/tag/devfarm/v%s"
 
 # customize play default thread pool size
 # see: https://www.playframework.com/documentation/2.3.x/ThreadPools
@@ -374,11 +375,12 @@ ldap {
 }
 
 # DevFarm
-application.devfarm.organization.name = "DevFarm"
-application.devfarm.project.request.name = "역량강화신청"
-application.devfarm.project.notice.name = "공지사항"
-application.devfarm.project.tech.name = "Tech-Tip"
-application.devfarm.project.bbs.name = "자유게시판"
-application.devfarm.project.qna.name = "QNA"
+devfarm.organization.name = "DevFarm"
+devfarm.project.request.name = "역량강화신청"
+devfarm.project.notice.name = "공지사항"
+devfarm.project.tech.name = "Tech-Tip"
+devfarm.project.bbs.name = "자유게시판"
+devfarm.project.qna.name = "QNA"
+devfarm.default.menus.when.create = "issue, board"
 
 include "social-login.conf"
