@@ -15,6 +15,7 @@ import controllers.annotation.IsCreatable;
 import jxl.write.WriteException;
 import models.*;
 import models.enumeration.Operation;
+import models.enumeration.ProjectScope;
 import models.enumeration.ResourceType;
 import models.enumeration.State;
 import org.apache.commons.collections.CollectionUtils;
@@ -75,6 +76,12 @@ public class IssueApp extends AbstractPostingApp {
             searchCondition.assigneeId = UserApp.currentUser().id;
         }
         searchCondition.pageNum = pageNum - 1;
+
+        // default for my issues
+        String orderBy = request().getQueryString("orderBy");
+        if (StringUtils.isBlank(orderBy)) {
+            searchCondition.orderBy = "updatedDate";
+        }
 
         // determine pjax or json when requested with XHR
         if (HttpUtil.isRequestedWithXHR(request())) {
@@ -287,12 +294,8 @@ public class IssueApp extends AbstractPostingApp {
         User current = UserApp.currentUser();
 
         Project project = null;
-        // Fallback #1: Favorite projects 1st if exists
-        if(!CollectionUtils.isEmpty(current.favoriteProjects)) {
-            project = current.favoriteProjects.get(current.favoriteProjects.size() - 1).project;
-        }
 
-        // Fallback #2: Last visited project
+        // Fallback #1: Last visited project
         List<Project> visitedProjects = current.getVisitedProjects();
         if (project == null && !CollectionUtils.isEmpty(visitedProjects)) {
             project = visitedProjects.get(0);
@@ -315,10 +318,18 @@ public class IssueApp extends AbstractPostingApp {
             project = Project.findByOwnerAndProjectName(current.loginId, "_private");
         }
 
-        // Fallback to any other project
+        // Fallback to my project which is private and recently created
+        if (project == null) {
+            List<Project> projects = Project.findProjectsCreatedByUserAndScope(current.loginId, ProjectScope.PRIVATE, "createdDate desc");
+            if (!CollectionUtils.isEmpty(projects)) {
+                project = projects.get(0);
+            }
+        }
+
+        // Fallback to my public project
         if( project == null ) {
-            List<Project> projects = Project.findProjectsByMember(current.id);
-            if(!CollectionUtils.isEmpty(projects)) {
+            List<Project> projects = Project.findProjectsCreatedByUserAndScope(current.loginId, ProjectScope.PUBLIC, "createdDate desc");
+            if (!CollectionUtils.isEmpty(projects)) {
                 project = projects.get(0);
             }
         }
@@ -566,7 +577,11 @@ public class IssueApp extends AbstractPostingApp {
         final Issue issue = Issue.findByNumber(project, number);
 
         Call redirectTo = routes.IssueApp.issue(project.owner, project.name, number);
-        issue.toNextState();
+        State state = issue.toNextState();
+
+        if(state == State.OPEN && issue.hasParentIssue() && issue.parent.state == State.CLOSED) {
+            issue.parent.toNextState();
+        }
         NotificationEvent notiEvent = NotificationEvent.afterStateChanged(issue.previousState(), issue);
         IssueEvent.addFromNotificationEvent(notiEvent, issue, UserApp.currentUser().loginId);
         return redirect(redirectTo);
@@ -819,6 +834,9 @@ public class IssueApp extends AbstractPostingApp {
             IssueEvent.addFromNotificationEvent(
                     NotificationEvent.afterStateChanged(issue.previousState(), issue),
                     issue, UserApp.currentUser().loginId);
+        } else {
+            issue.updatedDate = JodaDateUtil.now();
+            issue.update();
         }
 
         return redirect(RouteUtil.getUrl(savedComment));

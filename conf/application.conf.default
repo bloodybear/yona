@@ -4,7 +4,7 @@
 # Site Name
 # ~~~~~~~~~
 # The name of your website
-application.siteName="DevFarm"
+application.siteName="Yona"
 
 # Application Context
 # ~~~~~~~~~~~~~~~~~~~
@@ -19,7 +19,7 @@ application.siteName="DevFarm"
 # ones to be needed for login, login and creating accout.
 # NOTE: Even if this is false, anyone can create a account freely. If you don't
 # want to allow that, set signup.require.confirm to true.
-application.allowsAnonymousAccess=false
+application.allowsAnonymousAccess=true
 
 # Guest User Id Rule
 # ~~~~~~~~~~~~~
@@ -43,19 +43,19 @@ application.guest.user.login.id.prefix = ""
 # If you wants to make the user available to use yona
 # after the server administrator approved,uncomment below
 #
-signup.require.admin.confirm = false
+# signup.require.admin.confirm = true
 
 # If you only want to allow for signing up in specific email domains,
 # use the following option.
 # application.allowed.sending.mail.domains = "gmail.com, your-company.com"
 # And "" is option for no restriction.
 #
-application.allowed.sending.mail.domains = "midasit.com"
+# application.allowed.sending.mail.domains = ""
 
 # If following email verification option is true, all user will be locked when it sign-up,
 # until user click the verification link of verification confirm mail
 #
-application.use.email.verification = true
+# application.use.email.verification = true
 
 # Login form custom input message
 # application.login.page.loginId.placeholder = "Use Emp. no as login id"
@@ -171,7 +171,7 @@ application.scheme="http"
 # application.port="8080"
 
 # Application feedback url at top layout menu. You can remove feedback menu by commenting it.
-application.feedback.url="https://github.com/bloodybear/yona/issues"
+application.feedback.url="https://github.com/yona-projects/yona/issues"
 
 # Mailer
 # ~~~~~~
@@ -253,11 +253,10 @@ application.notification.draft-time = 30s
 application.update.notification.interval = 6h
 # A url to the git repository for Yona releases.
 application.update.check.use = true
-application.update.repositoryUrl = "https://github.com/bloodybear/yona"
-application.update.repositoryTagPath = "refs/tags/devfarm"
+application.update.repositoryUrl = "https://github.com/yona-projects/yona"
 # A format to construct the url to latest Yona release. "%s" is a format
 # specifier for Yona version to download like "0.5.7".
-application.update.releaseUrlFormat = "https://github.com/bloodybear/yona/releases/tag/devfarm/v%s"
+application.update.releaseUrlFormat = "https://github.com/yona-projects/yona/releases/tag/v%s"
 
 # customize play default thread pool size
 # see: https://www.playframework.com/documentation/2.3.x/ThreadPools
@@ -311,6 +310,10 @@ application.hide.project.listing = false
 # default: "public"
 project.default.scope.when.create = "public"
 
+# Display user email
+# default: true
+application.show.user.email = true
+
 # Google Analytics
 # ~~~~~~~~~~~~~~~~~
 # This data is used to better understand how users interact with the Web UI which gives us valuable information
@@ -348,7 +351,7 @@ application.use.social.login.name.sync = false
 
 # Allowed OAuth social login provider
 # choice: github, google
-application.social.login.support = ""
+application.social.login.support = "github, google"
 
 # LDAP Login Support
 # ~~~~~~~~~~~~~~~~~
@@ -371,18 +374,9 @@ ldap {
       # If your LDAP configuration support email login
       useEmailBaseLogin = false
       fallbackToLocalLogin = false
+      # If your LDAP configuration support English Name attribute
+      englishNameAttributeName = "givenName"
     }
 }
-
-# DevFarm
-devfarm.organization.name = "DevFarm"
-devfarm.project.notice.name = "공지사항"
-devfarm.project.tech.name = "Tech-Tip"
-devfarm.project.bbs.name = "자유게시판"
-devfarm.project.qna.name = "QNA"
-devfarm.default.menus.when.create = "issue, board"
-# esc
-esc.organization.name = "ESC"
-esc.welcome.show = false
 
 include "social-login.conf"

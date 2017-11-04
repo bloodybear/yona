@@ -2019,8 +2019,7 @@ label.inline-list {
 .guest-mixin() {
     background-color: rgba(255, 165, 0, 0.8);;
     color: white;
-    padding: 2px;
-    font-size: 10px;
+    padding: 0 4px;
 }
 
 .members.project {
@@ -2032,6 +2031,7 @@ label.inline-list {
         padding: 10px 5px;
         display:block;
         position: relative;
+        margin-left: 5px;
 
         .member-name {
             margin-top:2px;
@@ -2042,10 +2042,6 @@ label.inline-list {
         .member-id {
             line-height: 20px;
             color:#ccc;
-        }
-
-        &:nth-child(odd) {
-            margin-left: 0;
         }
 
         .member-setting {
@@ -2747,12 +2743,13 @@ label.inline-list {
 
     .posting-history {
         display: inline-block;
+        margin-left: 10px;
     }
 
     .content {
         padding:0 20px;
         margin-bottom: 20px;
-        min-height: 250px;
+        min-height: 150px;
 
         &.empty-content {
             text-align: center;
@@ -2763,6 +2760,30 @@ label.inline-list {
     }
     textarea.content {
         padding:6px;
+    }
+    .right-menu-icons {
+        button.icon {
+            line-height: 30px;
+            font-size: 22px;
+            color: lightgray;
+            .yobicon-lang {
+                font-size: 20px;
+            }
+            &.disabled {
+                color: #eee !important;
+            }
+            &:hover {
+                color: #51aacc;
+                opacity: 1;
+            }
+        }
+        .pt5px {
+            padding-top: 5px;
+        }
+    }
+
+    .count {
+        margin-left: -3px;
     }
 }
 
@@ -2859,6 +2880,9 @@ label.inline-list {
                     .rotate(45deg);
                 }
 
+                &:hover {
+                  box-shadow: 2px 2px 1px 0 rgb(220, 220, 220)
+                }
                 .meta-info {
                     height:22px;
                     padding:5px 15px;
@@ -2869,6 +2893,7 @@ label.inline-list {
                     .yobicon-comment {vertical-align: middle;}
 
                     .act-row {
+                        overflow: hidden;
                         i {
                             font-size: 20px;
                             line-height: 20px;
@@ -2876,6 +2901,11 @@ label.inline-list {
                             .opacity(20);
 
                             &.yobicon-edit-2 { margin-top:2px; }
+                            &.yobicon-hearts {
+                                &:hover {
+                                    color: #f68c52
+                                }
+                            }
                             &:hover {
                                 color:@yobi-link;
                                 .opacity(100);
@@ -2942,13 +2972,7 @@ label.inline-list {
 
                 .comment-body {
                     font-size: 1.1em;
-                    padding:15px 20px;
-                    :first-child {
-                        margin-top: 0;
-                    }
-                    :last-child {
-                        margin-bottom: 0;
-                    }
+                    padding: 5px 20px;
                 }
 
             }
@@ -3161,21 +3185,14 @@ div.markdown-loader {
 }
 
 div.markdown-preview {
-    font-size: 1.1em;
-    &.update-comment-body, &.comment-body {
-        font-size: 1.05em;
-    }
-    overflow-x:auto;
-    margin: 0;
-    vertical-align : middle;
-    border:2px solid #ccc;
+    border:1px solid #ccc;
     .border-radius(0 0 3px 3px);
     background: #FAFAFA;
-    padding: 10px 20px;
+    padding: 15px 20px;
 }
 
 .write-comment-box {
-    padding: 0px 0 15px 50px;
+    padding: 0 0 15px 54px;
     font-family:@base-font-family;
 
     .write-comment-wrap {
@@ -3233,6 +3250,13 @@ div.markdown-preview {
     margin:20px 0;
     overflow:auto;
     padding-right: 15px;
+    button {
+        i.yobicon-hearts {
+            &:hover {
+                color: #f68c52;
+            }
+        }
+    }
     button.icon {
         line-height: 30px;
         font-size: 22px;
@@ -3644,48 +3668,6 @@ label.issue-item-row {
                 }
             }
 
-            &.item-count-groups {
-                border:1px solid #EEE;
-                .border-radius(3px);
-                line-height: 14px;
-                margin-top:2px;
-                .comments-count:hover {
-                    color: lighten(@darkmagenta, 10%);
-                }
-                .vote-count:hover {
-                    color: lighten(@primary, 10%);
-                }
-                .vote-color {
-                    color: @primary;
-                }
-                .comments-count-color {
-                    color: @darkmagenta;
-                }
-
-                .count-groups {
-                    margin:0 auto;
-                    display:inline-block;
-                    text-align: center;
-                    padding:0 5px;
-                    float: left;
-
-                    &.item-icon {
-                        font-size: 9px;
-                        padding-top:2px;
-                        line-height: 12px;
-                        border-left:1px solid #EEE;
-
-                        &:first-child {
-                            border-left:none;
-                        }
-                    }
-
-                    &.item-count {
-                        padding:0 7px 0 0;
-                    }
-                }
-            }
-
             &.infos-icon-link {
                 color:#3592b5;
 
@@ -3733,6 +3715,51 @@ label.issue-item-row {
     }
 }
 
+.item-count-groups {
+    border:1px solid #EEE;
+    .border-radius(3px);
+    line-height: 14px;
+    margin-top:2px;
+    .comments-count:hover {
+        color: lighten(@darkmagenta, 10%);
+    }
+    .vote-count:hover {
+        color: lighten(@primary, 10%);
+    }
+    .vote-color {
+        color: @primary;
+    }
+    .comments-count-color {
+        color: @darkmagenta;
+    }
+
+    a:nth-child(2) {
+        margin-left: -5px;
+    }
+
+    .count-groups {
+        margin:0 auto;
+        display:inline-block;
+        text-align: center;
+        padding:0 5px;
+
+        &.item-icon {
+            font-size: 9px;
+            padding-top:2px;
+            line-height: 12px;
+            border-left:1px solid #EEE;
+
+            &:first-child {
+                border-left:none;
+            }
+        }
+
+        &.item-count {
+            padding:0 5px 0 0;
+        }
+    }
+}
+
 .state {
     margin-right:16px;
     margin-top:7px;
@@ -3758,7 +3785,7 @@ label.issue-item-row {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    color: #999;
+    color: #2196f3;
     font-size:11px;
     .border-radius(6px);
 }
@@ -3906,12 +3933,24 @@ label.issue-item-row {
 
 .vote-wrap {
     display:inline-block;
-    margin-left:3px;
+    direction: rtl;
+    margin-right: -3px;
     font-size:@base-font-size;
     vertical-align:middle;
 
+    a:hover {
+        text-decoration: none;
+    }
+
+    .yobicon-hearts:hover {
+        color: #f68c52;
+    }
+
     .ybtn  {
         padding:3px 12px !important;
+    }
+
+    &.voter-exists {
     }
 
     .heart {
@@ -3920,6 +3959,7 @@ label.issue-item-row {
         font-size: 17px;
         margin-right:2px;
         vertical-align:middle;
+        margin-top: 3px;
     }
 
     .desc {
@@ -3942,6 +3982,7 @@ label.issue-item-row {
 .voter-list-wrap {
     display:inline-block;
     margin-left:.3em;
+    margin-right: 5px;
     vertical-align:middle;
     overflow: hidden;
 }
@@ -3978,15 +4019,14 @@ label.issue-item-row {
 
 .voter-list {
     display:block;
-    height:30px;
     list-style:none;
 
     li {
         float:left;
         margin-right:3px;
-        line-height:30px;
-        padding-bottom: 5px;
+        line-height: 25px;
 
+        margin-top: -4px;
         &:last-of-type {
             margin-right:0;
         }
@@ -6770,7 +6810,6 @@ div.diff-body[data-outdated="true"] tr:hover .icon-comment {
         font-size: 14px;
         padding: 3px;
         .item-name {
-            background-color: white;
             vertical-align: middle;
         }
         .number {
@@ -6974,5 +7013,46 @@ div.diff-body[data-outdated="true"] tr:hover .icon-comment {
         .infos {
             margin-top: 4px;
         }
+    }
+}
+
+.subtask-mark {
+    border: 1px solid #e95e01;
+    border-radius: 3px;
+    padding: 2px 5px;
+    font-size: 14px;
+    color: #e95e01;
+    margin-right: 5px;
+}
+
+.subtask-number {
+    color: darkgrey;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.to-branch {
+    border: 1px solid;
+    padding: 0 5px;
+}
+
+.to-default-branch {
+    border: 1px solid #03a9f4;
+    padding: 0 5px;
+    color: #03a9f4;
+}
+
+.no-border-at-child {
+    .item-count-groups {
+        border: none !important;
+    }
+}
+
+.child-issues {
+    .selected-child {
+        font-weight: bold;
+        border: 1px solid #ddd;
+        background-color: #F5F5F5;
+        border-radius: 4px;
     }
 }

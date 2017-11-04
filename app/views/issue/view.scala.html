@@ -28,8 +28,12 @@
   }
 }
 
+@isVotedByCurrentUser = @{
+    issue.isVotedBy(UserApp.currentUser)
+}
+
 @urlToVote = @{
-    if(issue.isVotedBy(UserApp.currentUser)){
+    if(isVotedByCurrentUser){
         routes.VoteApp.unvote(project.owner, project.name, issue.getNumber).toString
     } else {
         routes.VoteApp.vote(project.owner, project.name, issue.getNumber).toString
@@ -37,7 +41,7 @@
 }
 
 @getVoteButtonTitle = {
-    @if(issue.isVotedBy(UserApp.currentUser)){
+    @if(isVotedByCurrentUser){
         @Messages("issue.unvote.description")
     } else {
         @Messages("issue.vote.description")
@@ -62,10 +66,10 @@
         @if(!openChildIssues.isEmpty || !closedChildIssues.isEmpty) {
             <div class="child-issues">
                 @defining(Issue.finder.byId(parentIssueId)) { parentIssue =>
-                    <div class="issue-item parent-issue"><a href="@routes.IssueApp.issue(parentIssue.project.owner, parentIssue.project.name, parentIssue.getNumber)" class="@if(parentIssue.id == issue.id){bold}">#@parentIssue.getNumber @parentIssue.title @if(parentIssue.assignee != null) {- @parentIssue.assignee.user.name}</a>
+                    <div class="issue-item parent-issue"><a href="@routes.IssueApp.issue(parentIssue.project.owner, parentIssue.project.name, parentIssue.getNumber)" class="@if(parentIssue.id == issue.id){bold}">#@parentIssue.getNumber @parentIssue.title @if(parentIssue.assignee != null) {- @parentIssue.assignee.user.getPureNameOnly}</a>
                         @defining(getPercent(closedChildIssues.size.toDouble, (openChildIssues.size + closedChildIssues.size).toDouble)) { percentage =>
-                        <div class="upload-progress">
-                            <div class="bar @if(percentage == 100){done} else {grey}" style="width: @percentage%;" title="Subtask"></div>
+                        <div class="upload-progress @if(percentage == 100){done-outline} else {red-outline}">
+                            <div class="bar @if(percentage == 100){done} else {red}" style="width: @percentage%;" title="Subtask"></div>
                         </div>
                         <span class="@if(percentage == 100){txt-green}">@if(percentage != 100){@closedChildIssues.size/}@(openChildIssues.size + closedChildIssues.size)</span>
                         <span class="parent-issue-state @parentIssue.state.state">@Messages("issue.state." + parentIssue.state.state)</span>
@@ -74,19 +78,19 @@
                 }
                 <hr class="parent-issue-delimeter"/>
                 @for(childIssue <- openChildIssues) {
-                    <div class="issue-item @if(childIssue.id == issue.id){bold}">
+                    <div class="issue-item @if(childIssue.id == issue.id){selected-child}">
                         <span class="state-label open"></span>
                         <a href="@routes.IssueApp.issue(childIssue.project.owner, childIssue.project.name, childIssue.getNumber)">
-                            <span class="item-name">@childIssue.title @if(childIssue.assignee != null) {- @childIssue.assignee.user.name}</span>
-                        </a>
+                            <span class="item-name"><span class="subtask-number">#@childIssue.getNumber</span> @childIssue.title@if(childIssue.assignee != null) { - @childIssue.assignee.user.getPureNameOnly}</span></a>
+                        <span class="font12 no-border-at-child">@common.commentAndVoterPairDisplay(childIssue, project)</span>
                     </div>
                 }
                 @for(childIssue <- closedChildIssues) {
-                    <div class="issue-item @if(childIssue.id == issue.id){bold}">
+                    <div class="issue-item @if(childIssue.id == issue.id){selected-child}">
                         <span class="state-label closed"><i class=" yobicon-checkmark"></i></span>
                         <a href="@routes.IssueApp.issue(childIssue.project.owner, childIssue.project.name, childIssue.getNumber)">
-                            <span class="item-name">@childIssue.title @if(childIssue.assignee != null) {- @childIssue.assignee.user.name}</span>
-                        </a>
+                            <span class="item-name"><span class="subtask-number">#@childIssue.getNumber</span> @childIssue.title@if(childIssue.assignee != null){ - @childIssue.assignee.user.getPureNameOnly}</span></a>
+                        <span class="font12 no-border-at-child">@common.commentAndVoterPairDisplay(childIssue, project)</span>
                     </div>
                 }
             </div>
@@ -110,6 +114,9 @@
                 <span class="badge badge-issue-@issue.state.state.toLowerCase">@Messages("issue.state." + issue.state.state)</span>
             </div>
             <div class="title">
+                @if(issue.parent != null) {
+                    <span class="subtask-mark">subtask</span>
+                }
                 <strong class="board-id">#@issue.getNumber</strong> @issue.title
                 <div class="pull-right hide show-in-mobile" style="font-size: 0.7em">
                     <span class="date" title="@JodaDateUtil.getDateString(issue.createdDate)">
@@ -129,25 +136,26 @@
                                 <img src="@User.findByLoginId(issue.authorLoginId).avatarUrl(32)" width="20" height="20">
                             </span>
                             @if(issue.authorLoginId != null){
-                                <strong class="name">@issue.getAuthor.name</strong>
+                                <strong class="name">@issue.getAuthor.getDisplayName</strong>
                                 <span class="loginid"> <strong>@{"@"}</strong>@issue.authorLoginId</span>
                             } else {
                                 <strong class="name">@Messages("issue.noAuthor")</strong>
                             }
                         </a>
-                </div>
-                @if(StringUtils.isNotEmpty(issue.history)){
-                    @if(UserApp.currentUser().isAnonymous){
-                        <div class="posting-history">
-                            <a href="@routes.UserApp.loginForm()?redirectUrl=@routes.IssueApp.issue(project.owner, project.name, issue.getNumber)" data-toggle="modal">@Messages("change.history")</a>
-                        </div>
-                    } else {
-                        <div class="posting-history">
-                            <a href="#-yona-posting-history" data-toggle="modal">@Messages("change.history")</a>
-                            @common.partial_history(issue)
-                        </div>
+                    @if(StringUtils.isNotEmpty(issue.history)){
+                        @if(UserApp.currentUser().isAnonymous){
+                            <div class="posting-history">
+                                <a href="@routes.UserApp.loginForm()?redirectUrl=@routes.IssueApp.issue(project.owner, project.name, issue.getNumber)" data-toggle="modal">@Messages("change.history")</a>
+                            </div>
+                        } else {
+                            <div class="posting-history">
+                                <a href="#-yona-posting-history" data-toggle="modal">@Messages("change.history")</a>
+                                @common.partial_history(issue)
+                            </div>
+                        }
                     }
-                }
+                </div>
+
                 @if(StringUtils.isEmpty(issue.body)){
                     <div class="content empty-content"></div>
                 } else {
@@ -167,35 +175,29 @@
                                 }
                                 </button>
                             }
-                            <div id="vote" class="vote-wrap">
-                                @if(isResourceCreatable(UserApp.currentUser, issue.asResource(), ResourceType.ISSUE_COMMENT)) {
-                                    <a href="@urlToVote" class="ybtn @if(issue.isVotedBy(UserApp.currentUser)){ybtn-watching}" title="@getVoteButtonTitle"
-                                       data-request-method="post" data-toggle="tooltip">
-                                        <span class="heart"><i class="yobicon-hearts"></i></span>
-                                        @if(issue.voters.size > 0) {
-                                            <strong class="count">@issue.voters.size</strong>
-                                        }
-                                    </a>
-                                } else {
-                                    <span class="ybtn ybtn-disabled" style="color:#777;" data-toggle="tooltip" title="@Messages("user.login.alert")" data-login="required">
-                                        <span class="heart"><i class="yobicon-hearts"></i></span>
-                                        @if(issue.voters.size > 0) {
-                                            <strong class="count">@issue.voters.size</strong>
-                                        }
-                                    </span>
-                                }
 
-                                @if(issue.voters.size > 0){
-                                    @partial_voters(issue, 3)
-                                }
-                            </div>
                         </div>
                     </div>
-
+                    <div id="vote" class="vote-wrap @if(issue.voters.size > 0){voter-exists}">
+                        @if(isResourceCreatable(UserApp.currentUser, issue.asResource(), ResourceType.ISSUE_COMMENT)) {
+                            <a href="@urlToVote" class="@if(issue.isVotedBy(UserApp.currentUser)) {ybtn-watching}" title="@getVoteButtonTitle"
+                            data-request-method="post" data-toggle="tooltip">
+                                <span class="heart"><i class="yobicon-hearts"></i></span>
+                            </a>
+                        } else {
+                            <span class="ybtn-disabled" style="color: #777;" data-toggle="tooltip" title="@Messages("user.login.alert")" data-login="required">
+                                <span class="heart"><i class="yobicon-hearts"></i></span>
+                            </span>
+                        }
+                        @if(issue.voters.size > 0) {
+                            @partial_voters(issue, 3)
+                        }
+                    </div>
                     @if(StringUtils.isNotBlank(IssueApi.TRANSLATION_API)){
                         <button type="button" id="translate" class="icon btn-transparent-with-fontsize-lineheight ml10"  data-toggle="tooltip" title="@Messages("button.translation")"><i class="yobicon-lang"></i></button>
                     }
 
+                    <span class="act-row">
                     @if(isAllowed(UserApp.currentUser(), issue.asResource(), Operation.UPDATE)) {
                         <button type="button" class="icon btn-transparent-with-fontsize-lineheight ml10 pt5px" data-toggle="tooltip" title="@Messages("button.edit")" onclick="window.location='@routes.IssueApp.editIssueForm(project.owner, project.name, issue.getNumber)'"><i class="yobicon-edit-2"></i></button>
                     } else {
@@ -209,6 +211,7 @@
                     } else {
                         <button type="button" class="icon disabled btn-transparent-with-fontsize-lineheight ml6" data-toggle='popover' data-trigger="hover" data-placement="top" data-content="@Messages("issue.can.not.be.deleted")"><i class="yobicon-trash"></i></button>
                     }
+                    </span>
                 </div>
                 <div class="watcher-list"></div>
                 <div class="subtasks">
@@ -239,7 +242,7 @@
                         <dl>
                             @if(project.menuSetting.issue) {
                                 <dd class="project-btn-item">
-                                    <a href="@routes.IssueApp.newIssueForm(project.owner, project.name)?parentIssueId=@parentIssueId" class="ybtn ybtn-success">@Messages("button.newIssue")</a>
+                                    <a href="@routes.IssueApp.newIssueForm(project.owner, project.name)?parentIssueId=@parentIssueId" class="ybtn ybtn-success">@Messages("button.newSubtask")</a>
                                 </dd>
                             }
                             <dt>@Messages("issue.assignee")</dt>
@@ -254,7 +257,7 @@
                                         <span class="avatar-wrap smaller">
                                             <img src="@User.findByLoginId(issue.assignee.user.loginId).avatarUrl" width="20" height="20">
                                         </span>
-                                        <strong class="name">@issue.assigneeName</strong>
+                                        <strong class="name">@issue.assignee.user.getDisplayName</strong>
                                         <span class="loginid"> <strong>@{"@"}</strong>@issue.assignee.user.loginId</span>
                                     </a>
                                     } else {
@@ -360,6 +363,21 @@
                                 @partial_show_selected_label(issue.labels.toList, routes.IssueApp.issues(project.owner, project.name, issue.state.state(), "html", 1).toString)
                             }
                         }
+                        <div class="act-row right-menu-icons">
+                            @if(isAllowed(UserApp.currentUser(), issue.asResource(), Operation.UPDATE)) {
+                                <button type="button" class="icon btn-transparent-with-fontsize-lineheight ml10 pt5px" data-toggle="tooltip" title="@Messages("button.edit")" onclick="window.location='@routes.IssueApp.editIssueForm(project.owner, project.name, issue.getNumber)'"><i class="yobicon-edit-2"></i></button>
+                            } else {
+                                <a href="@routes.IssueApp.editIssueForm(project.owner, project.name, issue.getNumber)"><button type="button" class="icon btn-transparent-with-fontsize-lineheight ml10 pt5px" data-toggle="tooltip" title="@Messages("button.show.original")"><i class="yobicon-edit-2"></i></button></a>
+                            }
+                            @if(issue.canBeDeleted) {
+                                @if(isAllowed(UserApp.currentUser(), issue.asResource(), Operation.DELETE)) {
+                                    <a href="#deleteConfirm" data-toggle="modal">
+                                        <button type="button" class="icon btn-transparent-with-fontsize-lineheight ml6" data-toggle='tooltip' title="@Messages("button.delete")"><i class="yobicon-trash"></i></button></a>
+                                }
+                            } else {
+                                <button type="button" class="icon disabled btn-transparent-with-fontsize-lineheight ml6" data-toggle='popover' data-trigger="hover" data-placement="top" data-content="@Messages("issue.can.not.be.deleted")"><i class="yobicon-trash"></i></button>
+                            }
+                        </div>
                         @**<!-- // -->**@
                     </form>
                 </div>
@@ -436,7 +454,7 @@
         });
 
         // detect comment which contains mention at me
-        $(".comment-body:contains('@UserApp.currentUser().loginId')").closest(".comment").addClass("mentioned");
+        $(".comment-body:contains('@UserApp.currentUser().getPureNameOnly')").closest(".comment").addClass("mentioned");
     });
 </script>
 <script>

@@ -41,7 +41,7 @@
                 @if(!isAuthoredMeTab) {
                     @if(user.name) {
                         <a href="@routes.UserApp.userInfo(user.loginId)" class="infos-item infos-link-item" data-toggle="tooltip" data-placement="bottom" title="@user.loginId">
-                        @user.name
+                        @user.getDisplayName
                         </a>
                     } else {
                         <span class="infos-item">@Messages("issue.noAuthor")</span>
@@ -51,6 +51,11 @@
                 <span class="infos-item" data-toggle="tooltip" data-placement="bottom" title="@JodaDateUtil.getDateString(issue.createdDate)">
                     @agoOrDateString(issue.createdDate)
                 </span>
+                @if(!issue.createdDate.equals(issue.updatedDate)) {
+                    <span class="infos-item" data-toggle="tooltip" data-placement="bottom" title="@JodaDateUtil.getDateString(issue.updatedDate)">
+                    update: @agoOrDateString(issue.updatedDate)
+                    </span>
+                }
 
                 @partial_list_subtask(project, issue)
 

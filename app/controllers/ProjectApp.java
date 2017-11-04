@@ -18,6 +18,7 @@ import models.*;
 import models.enumeration.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.HtmlEmail;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -176,7 +177,7 @@ public class ProjectApp extends Controller {
 
         if ((!AccessControl.isGlobalResourceCreatable(user))
                 || (Organization.isNameExist(owner) && !OrganizationUser.isAdmin(organization.id, user.id))) {
-            return forbidden(ErrorViews.Forbidden.render("'" + user.name + "' has no permission"));
+            return forbidden(ErrorViews.Forbidden.render("'" + user.getDisplayName() + "' has no permission"));
         }
 
         if (validateWhenNew(filledNewProjectForm)) {
@@ -841,8 +842,8 @@ public class ProjectApp extends Controller {
             Map<String, String> projectUserMap = new HashMap<>();
             if (user != null && StringUtils.isNotEmpty(user.loginId) && !user.loginId.equals(Constants.ADMIN_LOGIN_ID)) {
                 projectUserMap.put("loginid", user.loginId);
-                projectUserMap.put("searchText", user.name + user.loginId);
-                projectUserMap.put("name", user.name);
+                projectUserMap.put("searchText", user.name + user.getDisplayName() + user.loginId);
+                projectUserMap.put("name", user.getDisplayName());
                 projectUserMap.put("image", user.avatarUrl());
                 users.add(projectUserMap);
             }
@@ -1252,10 +1253,10 @@ public class ProjectApp extends Controller {
             return badRequest(ErrorViews.BadRequest.render());
         }
 
-        Webhook.create(project.id,
-                        addWebhookForm.field("payloadUrl").value(),
-                        addWebhookForm.field("secret").value(),
-                Boolean.valueOf(addWebhookForm.field("gitPushOnly").value()));
+        Webhook webhook = addWebhookForm.get();
+
+        Webhook.create(project.id, webhook.payloadUrl, webhook.secret,
+                BooleanUtils.toBooleanDefaultIfNull(webhook.gitPushOnly, false));
 
         return redirect(routes.ProjectApp.webhooks(project.owner, project.name));
     }
@@ -1285,17 +1286,17 @@ public class ProjectApp extends Controller {
 
     @IsAllowed(Operation.READ)
     @Transactional
-    public static Result goConventionMenu(String ownerId, String projectName)
+    public static Result goConventionMenu(String ownerId, String projectName, String state, String format, int pageNum)
             throws IOException, ServletException, SVNException, GitAPIException, WriteException {
         Project project = Project.findByOwnerAndProjectName(ownerId, projectName);
         List<History> histories = null;
 
         if( project.menuSetting.issue ) {
-            return IssueApp.issues(project.owner, project.name);
+            return IssueApp.issues(project.owner, project.name, state, format, pageNum);
         }
 
         if( project.menuSetting.board ) {
-            return redirect(routes.BoardApp.posts(project.owner, project.name, 1));
+            return redirect(routes.BoardApp.posts(project.owner, project.name, pageNum));
         }
 
         return redirect(routes.ProjectApp.project(project.owner, project.name));

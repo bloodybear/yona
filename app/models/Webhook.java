@@ -167,6 +167,7 @@ public class Webhook extends Model implements ResourceConvertible {
             requestHolder
                     .setHeader("Content-Type", "application/json")
                     .setHeader("User-Agent", "Yobi-Hookshot")
+                    .setHeader("Authorization", "token " + this.secret)
                     .post(payload)
                     .map(
                             new Function<WSResponse, Integer>() {
@@ -257,7 +258,7 @@ public class Webhook extends Model implements ResourceConvertible {
                 requestMessage += Messages.get(Lang.defaultLang(), "notification.type.pullrequest.commit.changed");
                 break;
         }
-        requestMessage += " <" + project.siteurl + "/pullRequest/" + eventPullRequest.number + "|#" + eventPullRequest.number + ": " + eventPullRequest.title + ">";
+        requestMessage += " <" + utils.Config.getScheme() + "://" + utils.Config.getHostport("localhost:9000") + RouteUtil.getUrl(eventPullRequest) + "|#" + eventPullRequest.number + ": " + eventPullRequest.title + ">";
 
         detailFields.add(buildTitleValueJSON(Messages.get(Lang.defaultLang(), "pullRequest.sender"), eventPullRequest.contributor.name, false));
         detailFields.add(buildTitleValueJSON(Messages.get(Lang.defaultLang(), "pullRequest.from"), eventPullRequest.fromBranch, true));
@@ -282,7 +283,7 @@ public class Webhook extends Model implements ResourceConvertible {
                 }
                 break;
         }
-        requestMessage += " <" + project.siteurl + "/pullRequest/" + eventPullRequest.number + "|#" + eventPullRequest.number + ": " + eventPullRequest.title + ">";
+        requestMessage += " <" + utils.Config.getScheme() + "://" + utils.Config.getHostport("localhost:9000") + RouteUtil.getUrl(eventPullRequest) + "|#" + eventPullRequest.number + ": " + eventPullRequest.title + ">";
 
         detailFields.add(buildTitleValueJSON(Messages.get(Lang.defaultLang(), "pullRequest.sender"), eventPullRequest.contributor.name, false));
         detailFields.add(buildTitleValueJSON(Messages.get(Lang.defaultLang(), "pullRequest.from"), eventPullRequest.fromBranch, true));
@@ -315,7 +316,7 @@ public class Webhook extends Model implements ResourceConvertible {
                 requestMessage += Messages.get(Lang.defaultLang(), "notification.type.issue.moved");
                 break;
         }
-        requestMessage += " <" + project.siteurl + "/issue/" + eventIssue.number + "|#" + eventIssue.number + ": " + eventIssue.title + ">";
+        requestMessage += " <" + utils.Config.getScheme() + "://" + utils.Config.getHostport("localhost:9000") + RouteUtil.getUrl(eventIssue) + "|#" + eventIssue.number + ": " + eventIssue.title + ">";
 
         detailFields.add(buildTitleValueJSON(Messages.get(Lang.defaultLang(), "issue.assignee"), eventIssue.assigneeName(), true));
         detailFields.add(buildTitleValueJSON(Messages.get(Lang.defaultLang(), "issue.state"), eventIssue.state.toString(), true));
@@ -339,10 +340,10 @@ public class Webhook extends Model implements ResourceConvertible {
         }
         switch (eventComment.asResource().getType()) {
             case ISSUE_COMMENT:
-                requestMessage += " <" + project.siteurl + "/issue/" + eventComment.getParent().number + "#comment-" + eventComment.id + "|#" + eventComment.getParent().number + ": " + eventComment.getParent().title + ">";
+                requestMessage += " <" + utils.Config.getScheme() + "://" + utils.Config.getHostport("localhost:9000") + RouteUtil.getUrl(eventComment) + "|#" + eventComment.getParent().number + ": " + eventComment.getParent().title + ">";
                 break;
             case NONISSUE_COMMENT:
-                requestMessage += " <" + project.siteurl + "/post/" + eventComment.getParent().number + "#comment-" + eventComment.id + "|#" + eventComment.getParent().number + ": " + eventComment.getParent().title + ">";
+                requestMessage += " <" + utils.Config.getScheme() + "://" + utils.Config.getHostport("localhost:9000") + RouteUtil.getUrl(eventComment) + "|#" + eventComment.getParent().number + ": " + eventComment.getParent().title + ">";
                 break;
         }
 
@@ -362,7 +363,7 @@ public class Webhook extends Model implements ResourceConvertible {
         commitJSON.put("timestamp",
                 new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ").
                         format(new Date(gitCommit.getCommitTime() * 1000L)));
-        commitJSON.put("url", project.siteurl+"/commit/"+gitCommit.getFullId());
+        commitJSON.put("url", utils.Config.getScheme() + "://" + utils.Config.getHostport("localhost:9000") + RouteUtil.getUrl(project) + "/commit/"+gitCommit.getFullId());
 
         authorJSON.put("name", gitCommit.getAuthorName());
         authorJSON.put("email", gitCommit.getAuthorEmail());
@@ -439,5 +440,17 @@ public class Webhook extends Model implements ResourceConvertible {
         targetProject.webhooks.remove(this);
         targetProject.update();
         super.delete();
+    }
+
+    @Override
+    public String toString() {
+        return "Webhook{" +
+                "id=" + id +
+                ", project=" + project +
+                ", payloadUrl='" + payloadUrl + '\'' +
+                ", secret='" + secret + '\'' +
+                ", gitPushOnly=" + gitPushOnly +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
