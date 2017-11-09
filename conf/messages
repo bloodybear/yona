@@ -1066,5 +1066,5 @@ devfarm.enroll.message = {0} 에 참여하시려면 그룹 멤버로 등록 요�
 devfarm.signupConfirmDesc = <strong>아이디</strong>는 <strong>자유롭게</strong> 정해서 사용하시면 됩니다.<br><strong>이름</strong>은 반드시 <strong>본명</strong>을 사용해주세요.<br><strong>이메일</strong>은 반드시 <strong>{0}</strong> 도메인을 사용해주세요.<br>다른 도메인의 이메일 주소로는 가입이 불가능합니다.<br>또한 이메일 인증을 받아야 정상적으로 사용이 가능합니다.
 esc.fullName = Eat Sleep Code
 esc.description = <strong>2017 MIDAS Research Festival</strong>이 개최됩니다. <strong>ESC</strong>는 Research Festival의 꽃입니다.<br>평소에 <strong>개발</strong>하고 싶었던 것, 확보하고 싶었던 <strong>신기술</strong>, 참신한 <strong>아이디어</strong>에 대해 프로토타입을 개발할 수 있는 흥분되는 <strong>기회</strong>를 제공합니다.
-esc.description2 = 이 사이트는 무의도에서도 접속이 가능합니다. 안심하고 사용하세요.
+esc.description2 = 여러분의 열정적인 참여 속에 ESC 가 종료되었습니다. 감사합니다.<br>종료 후에도 프로젝트는 계속 사용하실 수 있습니다 - {0}
 esc.noproject = 조별 프로젝트가 준비되어 있습니다.<br>조장을 통해 프로젝트에 참여하세요.
