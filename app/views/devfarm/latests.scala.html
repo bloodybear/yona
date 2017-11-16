@@ -134,7 +134,7 @@
                         <td>@Html(Messages("esc.description"))</td>
                     </tr>
                     <tr class="bubble-wrap gray" style="color=#999">
-                        <td>@Html(Messages("esc.description2", "<a href=\"" + routes.OrganizationApp.organization(ESC.ORGANIZATION_NAME) + "\">" + ESC.ORGANIZATION_NAME + "</a>"))</td>
+                        <td>@Html(Messages("esc.description2", routes.OrganizationApp.organization(ESC.ORGANIZATION_NAME), ESC.ORGANIZATION_NAME))</td>
                     </tr>
                 </table>
 @* ESC 프로젝트 목록
