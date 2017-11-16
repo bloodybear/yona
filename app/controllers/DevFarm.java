@@ -43,13 +43,16 @@ public class DevFarm extends Controller {
         return ok(latests.render());
     }
 
-    private static List<String> getVisibleProjectIds(@Nonnull Organization organization, @Nonnull List<Project> excludeProjects) {
-        List<Project> projects = organization.getVisibleProjects(UserApp.currentUser());
+    private static List<String> getBoardProjectIds() {
+        Project noticeProject = Project.findByOwnerAndProjectName(ORGANIZATION_NAME, NOTICE_PROJECT_NAME);
+        Project techProject = Project.findByOwnerAndProjectName(ORGANIZATION_NAME, TECH_PROJECT_NAME);
+        Project bbsProject = Project.findByOwnerAndProjectName(ORGANIZATION_NAME, BBS_PROJECT_NAME);
+        Project qnaProject = Project.findByOwnerAndProjectName(ORGANIZATION_NAME, QNA_PROJECT_NAME);
         List<String> projectsIds = new ArrayList<String>();
-        for (Project project : projects) {
-            if (excludeProjects.contains(project)) continue;
-            projectsIds.add(project.id.toString());
-        }
+        if (noticeProject != null) projectsIds.add(noticeProject.id.toString());
+        if (techProject != null) projectsIds.add(techProject.id.toString());
+        if (bbsProject != null) projectsIds.add(bbsProject.id.toString());
+        if (qnaProject != null) projectsIds.add(qnaProject.id.toString());
         return projectsIds;
     }
 
@@ -64,7 +67,7 @@ public class DevFarm extends Controller {
         }
 
         ExpressionList<Posting> el = Posting.finder.where();
-        el.in("project.id", getVisibleProjectIds(getOrganization(), excludeProjects));
+        el.in("project.id", getBoardProjectIds());
         el.order().desc("createdDate");
         return el.findPagingList(POSTS_LATEST).getPage(0).getList();
     }
