@@ -44,12 +44,10 @@ public class DevFarm extends Controller {
     }
 
     private static List<String> getBoardProjectIds() {
-        Project noticeProject = Project.findByOwnerAndProjectName(ORGANIZATION_NAME, NOTICE_PROJECT_NAME);
         Project techProject = Project.findByOwnerAndProjectName(ORGANIZATION_NAME, TECH_PROJECT_NAME);
         Project bbsProject = Project.findByOwnerAndProjectName(ORGANIZATION_NAME, BBS_PROJECT_NAME);
         Project qnaProject = Project.findByOwnerAndProjectName(ORGANIZATION_NAME, QNA_PROJECT_NAME);
         List<String> projectsIds = new ArrayList<String>();
-        if (noticeProject != null) projectsIds.add(noticeProject.id.toString());
         if (techProject != null) projectsIds.add(techProject.id.toString());
         if (bbsProject != null) projectsIds.add(bbsProject.id.toString());
         if (qnaProject != null) projectsIds.add(qnaProject.id.toString());
@@ -59,12 +57,6 @@ public class DevFarm extends Controller {
     public static List<Posting> getLatestPosts() {
         Organization org = getOrganization();
         if (org == null) return new ArrayList<>();
-
-        List<Project> excludeProjects = new ArrayList<>();
-        Project noticeProject = Project.findByOwnerAndProjectName(ORGANIZATION_NAME, NOTICE_PROJECT_NAME);
-        if (noticeProject != null) {
-            excludeProjects.add(noticeProject);
-        }
 
         ExpressionList<Posting> el = Posting.finder.where();
         el.in("project.id", getBoardProjectIds());
