@@ -134,11 +134,15 @@
                         <td>@Html(Messages("esc.description"))</td>
                     </tr>
                     <tr class="bubble-wrap gray" style="color=#999">
-                        <td>@Html(Messages("esc.description2", routes.OrganizationApp.organization(ESC.ORGANIZATION_NAME), ESC.ORGANIZATION_NAME))</td>
+                        @if( ESC.WELCOME_IN_PERIOD ) {
+                            <td>@Messages("esc.description2")</td>
+                        } else {
+                            <td>@Html(Messages("esc.description3", routes.OrganizationApp.organization(ESC.ORGANIZATION_NAME), ESC.ORGANIZATION_NAME))</td>
+                        }
                     </tr>
                 </table>
-@* ESC 프로젝트 목록
-                @if( ESC.isAdmin(UserApp.currentUser) || ESC.isMember(UserApp.currentUser) ) {
+
+                @if( ESC.WELCOME_IN_PERIOD && ( ESC.isAdmin(UserApp.currentUser) || ESC.isMember(UserApp.currentUser) ) ) {
 
                     @if(orgESCProjects.isEmpty()) {
 
@@ -181,7 +185,7 @@
                                         </div>
                                         <p class="name-tag">by <a href="@routes.UserApp.userInfo(project.owner)" class="owner-name-small">@project.owner</a>
                                             at <strong title="@JodaDateUtil.getDateString(project.createdDate)">@agoOrDateString(project.createdDate)</strong> <span class="small-font">@if(project.lastPushedDateAgo() != null) {, @Messages("project.codeUpdate") <strong title="@JodaDateUtil.getDateString(project.lastPushedDate)">@agoOrDateString(project.lastPushedDate)}</strong></span>
-                                        </p>
+                                    </p>
                                     </div>
                                 </div>
                                 <div class="stats-wrap pull-right">
@@ -245,7 +249,7 @@
                     }
 
                 }
-*@
+
             }
 
             </div>

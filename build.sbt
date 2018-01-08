@@ -3,7 +3,7 @@ import java.nio.file.Paths
 
 name := """devfarm"""
 
-version := "1.1.1"
+version := "1.1.2"
 
 libraryDependencies ++= Seq(
   // Add your project dependencies here,
