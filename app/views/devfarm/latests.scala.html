@@ -126,129 +126,127 @@
 
             @if( ESC.WELCOME_SHOW && orgESC != null) {
 
-                @if( ESC.WELCOME_IN_PERIOD ) {
-
-                    @if( ESC.isAdmin(UserApp.currentUser) || ESC.isMember(UserApp.currentUser) ) {
-
-                        @if(orgESCProjects.isEmpty()) {
-
-                            <div class="error-wrap">
-                                <p>@Html(Messages("esc.noproject"))</p>
-                            </div>
-
+                <h3 class="title">
+                    <span><strong>@ESC.ORGANIZATION_NAME</strong> - @Messages("esc.fullName")</span>
+                </h3>
+                <table class="welcome-table table borderless">
+                    <tr>
+                        <td>@Html(Messages("esc.description"))</td>
+                    </tr>
+                    <tr class="bubble-wrap gray" style="color=#999">
+                        @if( ESC.WELCOME_IN_PERIOD ) {
+                            <td>@Messages("esc.description2")</td>
                         } else {
-
-                            <ul class="all-projects" style="margin-bottom: -1px;">
-                            @for(project <- orgESCProjects) {
-                                <li class="project" data-item="project-item" data-value="@project.name @project.overview">
-                                    <div class="info-wrap">
-                                        <div class="owner-avatar-wrap hide-in-mobile">
-                                            <a href="@routes.ProjectApp.project(project.owner,project.name)">
-                                            @if(hasProjectLogo(project)){<img src="@urlToProjectLogo(project)" alt="@project" +
-                                                ".name"/>}
-                                            </a>
-                                        </div>
-                                        <div style="float:left">
-                                            <div class="header">
-                                                <a href="@routes.ProjectApp.project(project.owner, project.name)" class="black">@project.name</a>
-                                                @if(project.isForkedFromOrigin()){
-                                                    <span class="small-font blue-txt">
-                                                        <a class="origin-title" href='@routes.ProjectApp.project(project.originalProject.owner, project.originalProject.name)'>
-                                                            <i class="yobicon-split"></i>
-                                                            @project.originalProject.owner / @project.originalProject.name
-                                                        </a>
-                                                    </span>
-                                                }
-
-                                                @if(project.isPrivate){ <i class="yobicon-lock yobicon-small"></i> }
-                                                @if(project.isProtected){ <span class="project-protected" title="Group Project">G</span> }
-                                                @for(label <- project.labels) {
-                                                    <a class="project-label @label.category.toLowerCase()" href="@routes.ProjectApp.projects()?labelIds=@label.id">@label.name</a>
-                                                }
-                                            </div>
-                                            <div class="desc">
-                                            @project.overview
-                                            </div>
-                                            <p class="name-tag">by <a href="@routes.UserApp.userInfo(project.owner)" class="owner-name-small">@project.owner</a>
-                                                at <strong title="@JodaDateUtil.getDateString(project.createdDate)">@agoOrDateString(project.createdDate)</strong> <span class="small-font">@if(project.lastPushedDateAgo() != null) {, @Messages("project.codeUpdate") <strong title="@JodaDateUtil.getDateString(project.lastPushedDate)">@agoOrDateString(project.lastPushedDate)}</strong></span>
-                                        </p>
-                                        </div>
-                                    </div>
-                                    <div class="stats-wrap pull-right">
-                                        <div class="members">
-                                            <ul class="unstyled">
-                                            @for(member <- User.findUsersByProject(project.id)){
-                                                @if(member.loginId != project.owner){
-                                                    <li>
-                                                        <a href="@routes.UserApp.userInfo(member.loginId)" class="avatar-wrap">
-                                                            <img src="@member.avatarUrl" alt="@member.name">
-                                                        </a>
-                                                    </li>
-                                                }
-                                            }
-                                            </ul>
-                                            <p>
-                                                @Html(Messages("project.onmember", User.findUsersByProject(project.id).size))
-                                            <i class="yobicon-eye"></i> @Html(Messages("project.onwatching", project.getWatchingCount))
-                                                @if(User.isWatching(project)) {
-                                                    <i class="yobicon-lightbulb ramp-on" data-toggle="tooltip" title="@Messages("project.default.group.watching")"></i>
-                                                } else {
-                                                    <i class="yobicon-lightbulb ramp-off" data-toggle="tooltip" title="@Messages("project.you.are.not.watching", "")"></i>
-                                                }
-                                            </p>
-                                        </div>
-                                    </div>
-                                </li>
-                            }
-                            </ul>
-
+                            <td>@Html(Messages("esc.description3", routes.OrganizationApp.organization(ESC.ORGANIZATION_NAME), ESC.ORGANIZATION_NAME))</td>
                         }
+                    </tr>
+                </table>
+
+                @if( ESC.WELCOME_IN_PERIOD && ( ESC.isAdmin(UserApp.currentUser) || ESC.isMember(UserApp.currentUser) ) ) {
+
+                    @if(orgESCProjects.isEmpty()) {
+
+                        <div class="error-wrap">
+                            <p>@Html(Messages("esc.noproject"))</p>
+                        </div>
 
                     } else {
 
-                        @if( OrganizationUser.isGuest(orgESC, UserApp.currentUser)) {
-                            <div class="error-wrap" style=" padding: 70px 0px 150px 0px">
-                                <p>@Messages("devfarm.forbidden", orgESC.name)</p>
-                                <p class="message">@Messages("devfarm.enroll.message", orgESC.name)</p>
-                                <div class="project-util-wrap" style="position: absolute;
-                                    left: 50%;
-                                    transform: translateX(-50%);">
-                                    <ul class="project-util">
-                                        <button class="ybtn ybtn-small @if(User.enrolled(orgESC)) { ybtn-info } dropdown-toggle" type="button" data-toggle="dropdown">
-                                            <i class="yobicon-addfriend"></i> @Messages("organization.member.enrollment.title")
-                                        </button>
-                                        <div class="dropdown-menu flat right title">
-                                            <div class="pop-title">@getPopupTitle(orgESC)</div>
-                                            <div class="pop-content">
-                                            @getEnrollmentHelp(orgESC)
-                                            </div>
-                                            <div class="pop-content btn-wrap">
-                                                <a class="ybtn @if(!User.enrolled(orgESC)) { ybtn-info } enrollBtn" href="@getRequestUrl(orgESC)">
-                                                    <i class="@getClassName(orgESC)"></i>
-                                                    @getEnrollmentButtonTitle(orgESC)
-                                                </a>
-                                            </div>
+                        <ul class="all-projects" style="margin-bottom: -1px;">
+                        @for(project <- orgESCProjects) {
+                            <li class="project" data-item="project-item" data-value="@project.name @project.overview">
+                                <div class="info-wrap">
+                                    <div class="owner-avatar-wrap hide-in-mobile">
+                                        <a href="@routes.ProjectApp.project(project.owner,project.name)">
+                                        @if(hasProjectLogo(project)){<img src="@urlToProjectLogo(project)" alt="@project" +
+                                            ".name"/>}
+                                        </a>
+                                    </div>
+                                    <div style="float:left">
+                                        <div class="header">
+                                            <a href="@routes.ProjectApp.project(project.owner, project.name)" class="black">@project.name</a>
+                                            @if(project.isForkedFromOrigin()){
+                                                <span class="small-font blue-txt">
+                                                    <a class="origin-title" href='@routes.ProjectApp.project(project.originalProject.owner, project.originalProject.name)'>
+                                                        <i class="yobicon-split"></i>
+                                                        @project.originalProject.owner / @project.originalProject.name
+                                                    </a>
+                                                </span>
+                                            }
+
+                                            @if(project.isPrivate){ <i class="yobicon-lock yobicon-small"></i> }
+                                            @if(project.isProtected){ <span class="project-protected" title="Group Project">G</span> }
+                                            @for(label <- project.labels) {
+                                                <a class="project-label @label.category.toLowerCase()" href="@routes.ProjectApp.projects()?labelIds=@label.id">@label.name</a>
+                                            }
                                         </div>
-                                    </ul>
+                                        <div class="desc">
+                                        @project.overview
+                                        </div>
+                                        <p class="name-tag">by <a href="@routes.UserApp.userInfo(project.owner)" class="owner-name-small">@project.owner</a>
+                                            at <strong title="@JodaDateUtil.getDateString(project.createdDate)">@agoOrDateString(project.createdDate)</strong> <span class="small-font">@if(project.lastPushedDateAgo() != null) {, @Messages("project.codeUpdate") <strong title="@JodaDateUtil.getDateString(project.lastPushedDate)">@agoOrDateString(project.lastPushedDate)}</strong></span>
+                                    </p>
+                                    </div>
                                 </div>
-                            </div>
+                                <div class="stats-wrap pull-right">
+                                    <div class="members">
+                                        <ul class="unstyled">
+                                        @for(member <- User.findUsersByProject(project.id)){
+                                            @if(member.loginId != project.owner){
+                                                <li>
+                                                    <a href="@routes.UserApp.userInfo(member.loginId)" class="avatar-wrap">
+                                                        <img src="@member.avatarUrl" alt="@member.name">
+                                                    </a>
+                                                </li>
+                                            }
+                                        }
+                                        </ul>
+                                        <p>
+                                            @Html(Messages("project.onmember", User.findUsersByProject(project.id).size))
+                                        <i class="yobicon-eye"></i> @Html(Messages("project.onwatching", project.getWatchingCount))
+                                            @if(User.isWatching(project)) {
+                                                <i class="yobicon-lightbulb ramp-on" data-toggle="tooltip" title="@Messages("project.default.group.watching")"></i>
+                                            } else {
+                                                <i class="yobicon-lightbulb ramp-off" data-toggle="tooltip" title="@Messages("project.you.are.not.watching", "")"></i>
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
                         }
+                        </ul>
 
                     }
 
                 } else {
 
-                    <h3 class="title">
-                        <span><strong>@ESC.ORGANIZATION_NAME</strong> - @Messages("esc.fullName")</span>
-                    </h3>
-                    <table class="welcome-table table borderless">
-                        <tr>
-                            <td>@Html(Messages("esc.description"))</td>
-                        </tr>
-                        <tr class="bubble-wrap gray" style="color=#999">
-                            <td>@Html(Messages("esc.description2", routes.OrganizationApp.organization(ESC.ORGANIZATION_NAME), ESC.ORGANIZATION_NAME))</td>
-                        </tr>
-                    </table>
+                    @if( OrganizationUser.isGuest(orgESC, UserApp.currentUser)) {
+                        <div class="error-wrap" style=" padding: 70px 0px 150px 0px">
+                            <p>@Messages("devfarm.forbidden", orgESC.name)</p>
+                            <p class="message">@Messages("devfarm.enroll.message", orgESC.name)</p>
+                            <div class="project-util-wrap" style="position: absolute;
+                                left: 50%;
+                                transform: translateX(-50%);">
+                                <ul class="project-util">
+                                    <button class="ybtn ybtn-small @if(User.enrolled(orgESC)) { ybtn-info } dropdown-toggle" type="button" data-toggle="dropdown">
+                                        <i class="yobicon-addfriend"></i> @Messages("organization.member.enrollment.title")
+                                    </button>
+                                    <div class="dropdown-menu flat right title">
+                                        <div class="pop-title">@getPopupTitle(orgESC)</div>
+                                        <div class="pop-content">
+                                        @getEnrollmentHelp(orgESC)
+                                        </div>
+                                        <div class="pop-content btn-wrap">
+                                            <a class="ybtn @if(!User.enrolled(orgESC)) { ybtn-info } enrollBtn" href="@getRequestUrl(orgESC)">
+                                                <i class="@getClassName(orgESC)"></i>
+                                                @getEnrollmentButtonTitle(orgESC)
+                                            </a>
+                                        </div>
+                                    </div>
+                                </ul>
+                            </div>
+                        </div>
+                    }
 
                 }
 
